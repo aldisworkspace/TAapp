@@ -62,3 +62,31 @@
   "quiz": {"q":"...","options":["...","...","...","..."],"answer":2,"why":"..."},
   "sources": [{"publisher":"Federal Reserve","title":"...","url":"https://..."}]   // reference pages: central banks, IMF, OECD, IEA, Britannica, Wikipedia, Investopedia
 }]}
+
+## v3 additions — "понятно новичку" (reader is smart but NOT a specialist in any sphere)
+Write for a sharp 17-year-old who has never studied economics, politics or energy. Everyday analogies welcome. No jargon without explanation.
+
+"primer": 2-3 questions a newcomer must understand BEFORE the story makes sense, with plain answers.
+  [{"q": "Зачем танкеру вообще флаг?", "a": "Каждое судно обязано быть зарегистрировано в какой-то стране — как машина с номерами. Без регистрации его не застрахуют и не пустят в порт."}]   a <= 230 chars
+
+"gloss": EVERY abbreviation, organisation, index, law or jargon word that appears in hook/facts/mechanism/links/primer/quiz and that a newcomer may not know. "k" must appear in the text exactly as written there (same case/inflection as in at least one place).
+  [{"k": "ФРС", "v": "Федеральная резервная система — центральный банк США. Решает, сколько стоит занять доллары; от этого зависят кредиты по всему миру."}]   v <= 180 chars, plain words
+
+"actors": who is involved and what they do to each other (drawn as an animated map).
+  {"nodes": [{"id": "ofac", "label": "Минфин США", "icon": "gov"}, ...],   3-5 nodes, label <= 18 chars
+   "edges": [{"from": "ofac", "to": "registry", "label": "санкции"}, ...]}  2-5 edges, label <= 16 chars
+  icon ∈ oil, ship, bank, money, chip, factory, power, gov, law, flag, people, chart-up, chart-down, globe, warning, art, media, data, pipe, vote
+
+"mechanism"[i] gets two new fields (keep "step" and "kind"; you MAY rewrite "step" simpler, <= 90 chars):
+  "why": plain-language reason this link leads to the next one (<= 170 chars), an analogy if it helps
+  "icon": one icon from the list above
+
+"links"[i] gets "chain": 2-4 short hops showing HOW the effect travels, each <= 38 chars.
+  {"sphere": "economy", "text": "...", "chain": ["Нефть дороже", "Бензин и доставка дороже", "Цены в магазинах растут"]}
+
+"quiz" gets "explain": one line per option, same order as options: why it is right or why it is wrong (<= 130 chars each).
+
+"explain": a "explain in your own words" task, checked by Claude in the app.
+  {"q": "Своими словами: почему санкции против реестра бьют сильнее, чем против одного танкера?", "points": ["через реестр проходят многие суда", "без флага нет страховки и портов", "одним ударом выключаются все сразу"]}  2-4 key points the answer must contain
+
+# glossary.json (app/glossary.json): {"items": [{"k": "ФРС", "alt": ["Fed", "Федрезерв"], "v": "..."}]} — common abbreviations/organisations/jargon across all spheres; the app highlights them everywhere.

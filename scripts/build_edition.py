@@ -44,6 +44,11 @@ def check(s):
     g = s.get("guess")
     if g is not None and not (1 <= g.get("at", 0) < len(s.get("mechanism") or []) and 0 <= g.get("answer", -1) < len(g.get("options") or [])):
         errs.append("bad guess")
+    a = s.get("actors")
+    if a is not None:
+        ids = {n.get("id") for n in a.get("nodes") or []}
+        if not 2 <= len(ids) <= 5 or any(e.get("from") not in ids or e.get("to") not in ids for e in a.get("edges") or []):
+            errs.append("bad actors")
     for l in s.get("links") or []:
         if l.get("sphere") not in SPHERES:
             errs.append(f"bad link sphere {l.get('sphere')}")
@@ -59,11 +64,21 @@ def main():
     enrich = {}
     for p in sorted(RAW.glob("enrich*.json")):
         enrich.update(json.loads(p.read_text()))
+    v3 = {}
+    for p in sorted(RAW.glob("v3-*.json")):
+        v3.update(json.loads(p.read_text()))
     for p in sorted(RAW.glob("*.json")):
-        if p.name.startswith("enrich"):
+        if p.name.startswith("enrich") or p.name.startswith("v3-"):
             continue
         for s in json.loads(p.read_text())["stories"]:
             s.update(enrich.get(s.get("id"), {}))
+            x = dict(v3.get(s.get("id"), {}))
+            qe = x.pop("quiz_explain", None)
+            if x.get("mechanism") and len(x["mechanism"]) != len(s.get("mechanism") or []):
+                x.pop("mechanism")  # never break the guess index
+            s.update(x)
+            if qe and s.get("quiz") and len(qe) == len(s["quiz"].get("options", [])):
+                s["quiz"]["explain"] = qe
             e = check(s)
             if s.get("id") in seen:
                 e.append("duplicate id")
