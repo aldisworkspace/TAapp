@@ -1,0 +1,17 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "low-contrast",
+        "value": "*",
+        "files": [
+          "app/index.html"
+        ],
+        "createdAt": "2026-11-08T08:11:39.589Z",
+        "reason": "Claude verified in browser: computed colors are light tokens (rgb(238,241,250) on #0A0E1A); scanner resolved inherited color as #000"
+      }
+    ]
+  }
+}
