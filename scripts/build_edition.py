@@ -35,6 +35,15 @@ def check(s):
     for m in s.get("mechanism") or []:
         if m.get("kind") not in ("fact", "inference"):
             errs.append("mechanism kind")
+    v = s.get("visual")
+    if v is not None:
+        if v.get("type") not in ("bars", "change", "share", "timeline"):
+            errs.append("bad visual type")
+        if not 1 <= int(v.get("src", 0)) <= n:
+            errs.append("visual src out of range")
+    g = s.get("guess")
+    if g is not None and not (1 <= g.get("at", 0) < len(s.get("mechanism") or []) and 0 <= g.get("answer", -1) < len(g.get("options") or [])):
+        errs.append("bad guess")
     for l in s.get("links") or []:
         if l.get("sphere") not in SPHERES:
             errs.append(f"bad link sphere {l.get('sphere')}")
@@ -47,8 +56,14 @@ def main():
     date = sys.argv[1]
     title = sys.argv[sys.argv.index("--title") + 1] if "--title" in sys.argv else None
     stories, seen, bad = [], set(), 0
+    enrich = {}
+    for p in sorted(RAW.glob("enrich*.json")):
+        enrich.update(json.loads(p.read_text()))
     for p in sorted(RAW.glob("*.json")):
+        if p.name.startswith("enrich"):
+            continue
         for s in json.loads(p.read_text())["stories"]:
+            s.update(enrich.get(s.get("id"), {}))
             e = check(s)
             if s.get("id") in seen:
                 e.append("duplicate id")
@@ -78,6 +93,10 @@ def main():
         idx["editions"].append(date)
     idx["editions"] = sorted(idx["editions"], reverse=True)[:14]
     idx_p.write_text(json.dumps(idx, indent=1))
+    lib = ROOT / "app" / "library"
+    if lib.exists():
+        files = sorted(f.name for f in lib.glob("*.json") if f.name != "index.json")
+        (lib / "index.json").write_text(json.dumps({"files": files}, indent=1))
     print(f"ok: {len(mixed)} stories -> app/editions/{date}.json; index has {len(idx['editions'])} editions")
 
 

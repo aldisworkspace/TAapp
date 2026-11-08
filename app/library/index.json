@@ -1,0 +1,12 @@
+{
+ "files": [
+  "arts.json",
+  "economy.json",
+  "energy.json",
+  "finance.json",
+  "intl.json",
+  "media.json",
+  "politics.json",
+  "tech.json"
+ ]
+}

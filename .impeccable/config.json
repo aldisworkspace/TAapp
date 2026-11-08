@@ -11,6 +11,15 @@
         ],
         "createdAt": "2026-11-08T08:11:39.589Z",
         "reason": "Claude verified in browser: computed colors are light tokens (rgb(238,241,250) on #0A0E1A); scanner resolved inherited color as #000"
+      },
+      {
+        "rule": "kicker-above-heading",
+        "value": "*",
+        "files": [
+          "design/directions.html"
+        ],
+        "createdAt": "2026-11-08T08:39:06.331Z",
+        "reason": "Claude: throwaway direction mockup board, not shipped; labels carry real metadata (sphere, date)"
       }
     ]
   }

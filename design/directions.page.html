@@ -1,0 +1,193 @@
+<title>Twin Angels Directions</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;700;800&family=IBM+Plex+Mono:wght@500&family=Golos+Text:wght@400;500;700;900&family=Noto+Serif+Display:ital,wght@0,600;1,500&display=swap">
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#2A2D35;color:#E9ECF2;font:15px/1.4 system-ui;padding:28px 16px 60px}
+h1{font:600 18px system-ui;margin:0 0 4px}
+.sub{color:#A9AFBD;margin:0 0 28px;max-width:70ch}
+.dir{margin-bottom:48px}
+.dir h2{font:700 22px system-ui;margin:0 0 4px}
+.dir p.d{color:#A9AFBD;margin:0 0 16px;max-width:70ch}
+.phones{display:flex;gap:20px;flex-wrap:wrap}
+.ph{width:340px;height:700px;border-radius:36px;overflow:hidden;position:relative;flex:none;box-shadow:0 20px 50px rgba(0,0,0,.35)}
+.ph .in{position:absolute;inset:0;padding:54px 22px 26px;display:flex;flex-direction:column;gap:14px}
+.ph .bar{position:absolute;left:0;right:0;bottom:0;height:3px}
+svg text{dominant-baseline:middle}
+
+/* ===== A — Сводка ===== */
+.A{background:#F4F5F7;color:#0E1116;font-family:Onest,system-ui}
+.A .top{display:flex;justify-content:space-between;align-items:center;font:500 11px "IBM Plex Mono",monospace;letter-spacing:.08em;text-transform:uppercase;color:#5B6270}
+.A .tag{color:#2F5BEA;display:flex;gap:6px;align-items:center}
+.A .tag i{width:7px;height:7px;background:#2F5BEA;border-radius:50%}
+.A h3{font:800 28px/1.08 Onest;letter-spacing:-.02em;margin:4px 0 0}
+.A .hook{font-size:16px;color:#3A404C;margin:0}
+.A .card{background:#fff;border-radius:18px;padding:16px;border:1px solid #E3E6EB}
+.A .lbl{font:500 10.5px "IBM Plex Mono";letter-spacing:.08em;text-transform:uppercase;color:#7A8190}
+.A .prog{display:flex;gap:4px;position:absolute;top:22px;left:22px;right:22px}
+.A .prog i{flex:1;height:3px;border-radius:2px;background:#D9DDE3}
+.A .prog i.on{background:#0E1116}
+.A .step{display:grid;grid-template-columns:22px 1fr;gap:10px;font-size:14.5px;line-height:1.35}
+.A .q{margin-top:auto;background:#0E1116;color:#fff;border-radius:16px;padding:14px 16px;font-weight:500}
+.A .q small{display:block;font:500 10.5px "IBM Plex Mono";letter-spacing:.08em;color:#9AA3B5;text-transform:uppercase;margin-bottom:4px}
+
+/* ===== B — Эфир ===== */
+.B{background:#07080C;color:#F2F3F7;font-family:"Golos Text",system-ui}
+.B .field{position:absolute;left:0;right:0;top:0;height:330px;background:#2C4BFF;overflow:hidden}
+.B .field svg{position:absolute;inset:0}
+.B .in{z-index:1}
+.B .top{display:flex;justify-content:space-between;font:700 12px "Golos Text";letter-spacing:.02em}
+.B .pill{background:rgba(0,0,0,.28);padding:5px 10px;border-radius:99px}
+.B h3{font:900 30px/1.02 "Golos Text";letter-spacing:-.02em;margin:0}
+.B .hook{color:#B9BECC;font-size:15.5px;margin:0}
+.B .rail{display:flex;gap:6px;position:absolute;right:14px;bottom:110px;flex-direction:column;z-index:2}
+.B .rail span{width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.1);display:grid;place-items:center;font:700 11px "Golos Text"}
+.B .chip{display:inline-flex;gap:6px;align-items:center;background:#16181F;border-radius:12px;padding:10px 12px;font-size:14px;line-height:1.3}
+.B .node{border-radius:16px;padding:12px 14px;font-size:14.5px;line-height:1.3;font-weight:500}
+
+/* ===== C — Плакат ===== */
+.C{background:#3D63F0;color:#0B0D12;font-family:Onest,system-ui}
+.C .top{display:flex;justify-content:space-between;font:500 11px "IBM Plex Mono";letter-spacing:.1em;text-transform:uppercase}
+.C h3{font:600 34px/1.0 "Noto Serif Display",serif;letter-spacing:-.01em;margin:0;color:#0B0D12}
+.C h3 em{font-style:italic;font-weight:500;color:#fff}
+.C .hook{font-size:15.5px;margin:0;color:#0B0D12}
+.C .paper{background:#F3EFE6;border-radius:4px;padding:16px;color:#0B0D12}
+.C .num{font:600 56px/1 "Noto Serif Display";color:#fff}
+.C .lbl{font:500 10.5px "IBM Plex Mono";letter-spacing:.1em;text-transform:uppercase}
+.C .ink{background:#0B0D12;color:#F3EFE6}
+</style>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>:root{color-scheme:dark}body{padding-left:max(16px,env(safe-area-inset-left,0px))!important;padding-right:max(16px,env(safe-area-inset-right,0px))!important}.ph{max-width:100%}</style>
+
+<h1>Twin Angels: три направления</h1>
+<p class="sub">Одна и та же реальная история, по два экрана на каждое направление: обложка с инфографикой и механизм в виде схемы. Цифры на графиках взяты из источников истории: КТК 64,8 млн т и Атырау–Самара 9,2 млн т за 2025 год.</p>
+
+<!-- ================= A ================= -->
+<section class="dir">
+<h2>A · Сводка</h2>
+<p class="d">Светлое направление, как графика Bloomberg или FT. Спокойный гротеск Onest, точная инфографика, много воздуха. Подходит для чтения подряд по 15 минут. Вовлекают прогресс-полоски сверху, как в Stories, и вопрос в конце каждой карточки.</p>
+<div class="phones">
+ <div class="ph A"><div class="prog"><i class="on"></i><i></i><i></i><i></i><i></i></div><div class="in">
+  <div class="top"><span class="tag"><i></i>Международка</span><span>3 ноября</span></div>
+  <h3>Удар дронов по Самаре на сутки остановил нефть Казахстана</h3>
+  <p class="hook">Казахстан не воюет, но его нефть идёт через Россию.</p>
+  <div class="card">
+   <div class="lbl">Экспорт нефти Казахстана, 2025, млн т</div>
+   <svg viewBox="0 0 296 150" width="100%" style="margin-top:10px">
+    <text x="0" y="14" font-family="Onest" font-size="13" font-weight="500" fill="#0E1116">КТК → Новороссийск</text>
+    <rect x="0" y="28" width="270" height="22" rx="4" fill="#0E1116"/><text x="262" y="39" text-anchor="end" font-family="IBM Plex Mono" font-size="12" fill="#fff">64,8</text>
+    <text x="0" y="74" font-family="Onest" font-size="13" font-weight="500" fill="#0E1116">Атырау–Самара</text>
+    <rect x="0" y="88" width="38.4" height="22" rx="4" fill="#2F5BEA"/><text x="46" y="99" font-family="IBM Plex Mono" font-size="12" fill="#2F5BEA">9,2 · остановлен 2 ноября</text>
+    <text x="0" y="136" font-family="IBM Plex Mono" font-size="10.5" fill="#7A8190">ОБА МАРШРУТА ИДУТ ЧЕРЕЗ РОССИЮ</text>
+   </svg>
+  </div>
+  <div class="q"><small>Проверь себя · 20 XP</small>Почему переход на второй маршрут почти не снижает риск?</div>
+ </div></div>
+
+ <div class="ph A"><div class="prog"><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i></div><div class="in">
+  <div class="top"><span class="tag"><i></i>Механизм</span><span>3 / 5</span></div>
+  <svg viewBox="0 0 296 430" width="100%">
+   <defs><marker id="aA" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#0E1116"/></marker></defs>
+   <rect x="0" y="0" width="296" height="64" rx="14" fill="#fff" stroke="#E3E6EB"/>
+   <text x="16" y="22" font-family="IBM Plex Mono" font-size="10" fill="#7A8190">ФАКТ</text>
+   <text x="16" y="44" font-family="Onest" font-size="14" font-weight="500" fill="#0E1116">Экспорт идёт по трубам России</text>
+   <line x1="148" y1="64" x2="148" y2="96" stroke="#0E1116" stroke-width="1.5" marker-end="url(#aA)"/>
+   <rect x="0" y="100" width="296" height="64" rx="14" fill="#fff" stroke="#E3E6EB"/>
+   <text x="16" y="122" font-family="IBM Plex Mono" font-size="10" fill="#7A8190">ФАКТ</text>
+   <text x="16" y="144" font-family="Onest" font-size="14" font-weight="500" fill="#0E1116">Дроны бьют по узлу в Самаре</text>
+   <line x1="148" y1="164" x2="148" y2="196" stroke="#0E1116" stroke-width="1.5" marker-end="url(#aA)"/>
+   <rect x="0" y="200" width="296" height="64" rx="14" fill="#2F5BEA"/>
+   <text x="16" y="222" font-family="IBM Plex Mono" font-size="10" fill="#C9D5FF">ФАКТ · СЕЙЧАС</text>
+   <text x="16" y="244" font-family="Onest" font-size="14" font-weight="500" fill="#fff">Транзит Казахстана встаёт</text>
+   <line x1="148" y1="264" x2="148" y2="296" stroke="#9AA1AE" stroke-width="1.5" stroke-dasharray="4 4"/>
+   <rect x="0" y="300" width="296" height="120" rx="14" fill="none" stroke="#9AA1AE" stroke-dasharray="5 5"/>
+   <text x="148" y="336" text-anchor="middle" font-family="Onest" font-size="14" font-weight="700" fill="#0E1116">Что будет дальше?</text>
+   <text x="148" y="360" text-anchor="middle" font-family="Onest" font-size="12.5" fill="#5B6270">Выбери следующее звено,</text>
+   <text x="148" y="378" text-anchor="middle" font-family="Onest" font-size="12.5" fill="#5B6270">потом сверим с ответом</text>
+  </svg>
+ </div></div>
+</div>
+</section>
+
+<!-- ================= B ================= -->
+<section class="dir">
+<h2>B · Эфир</h2>
+<p class="d">Тёмное направление, ближе всего к TikTok. Верхняя половина экрана — большой графический «кадр» в цвете сферы: схема, карта потоков или крупная цифра. Плотный жирный шрифт Golos, кнопки справа, как в рилсах. Больше всего похоже на ленту, от которой трудно оторваться.</p>
+<div class="phones">
+ <div class="ph B"><div class="field"><svg viewBox="0 0 340 330" preserveAspectRatio="xMidYMid slice">
+   <circle cx="70" cy="190" r="34" fill="#07080C"/><text x="70" y="190" text-anchor="middle" font-family="Golos Text" font-size="11" font-weight="700" fill="#fff">KZ</text>
+   <path d="M104 182 C170 120, 220 110, 296 96" stroke="#fff" stroke-width="20" fill="none" stroke-linecap="round"/>
+   <path d="M104 202 C170 220, 210 240, 296 250" stroke="#fff" stroke-width="5" fill="none" stroke-linecap="round" stroke-dasharray="2 0"/>
+   <g transform="translate(205 236)"><circle r="17" fill="#FF5A4E"/><path d="M-6-6L6 6M6-6L-6 6" stroke="#fff" stroke-width="3" stroke-linecap="round"/></g>
+   <text x="300" y="80" text-anchor="end" font-family="Golos Text" font-size="12" font-weight="700" fill="#fff">КТК · 64,8 млн т</text>
+   <text x="300" y="272" text-anchor="end" font-family="Golos Text" font-size="12" font-weight="700" fill="#fff">Атырау–Самара · 9,2</text>
+   <text x="24" y="300" font-family="Golos Text" font-size="11" fill="rgba(255,255,255,.75)">Толщина линии — объём за 2025 год</text>
+ </svg></div>
+ <div class="in" style="padding-top:22px">
+  <div class="top"><span class="pill">Международка</span><span class="pill">Серия 4</span></div>
+  <div style="margin-top:300px;display:grid;gap:10px">
+   <h3>Дроны над Самарой остановили нефть Казахстана</h3>
+   <p class="hook">Чужая война, наш экспорт. Свайп → механизм.</p>
+  </div>
+ </div>
+ <div class="rail" style="bottom:180px"><span>Aa</span><span>?</span><span>↗</span></div>
+ <div class="bar" style="background:#2C4BFF;width:30%"></div>
+ </div>
+
+ <div class="ph B"><div class="in">
+  <div class="top"><span class="pill" style="background:#16181F">Механизм</span><span class="pill" style="background:#16181F">3 / 5</span></div>
+  <div class="node" style="background:#16181F">Экспорт Казахстана идёт по трубам России</div>
+  <div style="text-align:center;color:#2C4BFF;font-weight:900">↓</div>
+  <div class="node" style="background:#16181F">Дроны бьют по узлу в Самаре</div>
+  <div style="text-align:center;color:#2C4BFF;font-weight:900">↓</div>
+  <div class="node" style="background:#2C4BFF">Транзит встаёт на сутки</div>
+  <div style="text-align:center;color:#8A90A0;font-weight:900">↓</div>
+  <div style="display:grid;gap:8px">
+   <div style="font:700 13px 'Golos Text';color:#9097A8">Угадай следующее звено</div>
+   <span class="chip">Переход на КТК решает проблему</span>
+   <span class="chip">Оба маршрута уязвимы к одному риску</span>
+   <span class="chip">Нефть дешевеет для Казахстана</span>
+  </div>
+ </div></div>
+</div>
+</section>
+
+<!-- ================= C ================= -->
+<section class="dir">
+<h2>C · Плакат</h2>
+<p class="d">Каждая карточка — постер в цвете своей сферы, как обложки журналов в Instagram. Заголовки набраны антиквой с курсивом, крупные цифры, бумажные вставки с графикой. Самое запоминающееся: у каждой сферы свой цвет и характер, и это помогает памяти.</p>
+<div class="phones">
+ <div class="ph C"><div class="in">
+  <div class="top"><span>Международка · №07</span><span>03.11</span></div>
+  <h3>Чужая война <em>останавливает</em> нефть Казахстана</h3>
+  <p class="hook">Дроны ударили по узлу в Самаре, и 2 ноября прокачка встала на сутки.</p>
+  <div class="paper">
+   <div class="lbl">Доля маршрутов в экспорте нефти, 2025</div>
+   <svg viewBox="0 0 296 120" width="100%" style="margin-top:12px">
+    <rect x="0" y="0" width="254" height="56" fill="#0B0D12"/><text x="12" y="28" font-family="Onest" font-size="13" font-weight="700" fill="#F3EFE6">КТК 64,8</text>
+    <rect x="256" y="0" width="40" height="56" fill="#3D63F0"/><text x="276" y="72" text-anchor="middle" font-family="IBM Plex Mono" font-size="10" fill="#0B0D12">9,2</text>
+    <text x="0" y="100" font-family="IBM Plex Mono" font-size="10" letter-spacing="1" fill="#0B0D12">СИНИЙ — АТЫРАУ–САМАРА, ОСТАНОВЛЕН</text>
+   </svg>
+  </div>
+  <div style="margin-top:auto;display:flex;align-items:end;justify-content:space-between">
+   <div><div class="num">7,57</div><div class="lbl">млн т за 9 мес. 2026 по маршруту</div></div>
+  </div>
+ </div></div>
+
+ <div class="ph C" style="background:#F3EFE6"><div class="in">
+  <div class="top"><span>Механизм</span><span>Звено 3 из 5</span></div>
+  <h3 style="font-size:28px">Почему <em style="color:#3D63F0">второй маршрут</em> не спасает</h3>
+  <svg viewBox="0 0 296 300" width="100%">
+   <rect x="0" y="0" width="140" height="80" fill="#0B0D12"/><text x="12" y="28" font-family="Onest" font-size="12.5" font-weight="700" fill="#F3EFE6">Риск: Россия</text><text x="12" y="52" font-family="IBM Plex Mono" font-size="10" fill="#B9B4A8">ОБЩИЙ ДЛЯ ВСЕХ</text>
+   <path d="M140 40 H190" stroke="#0B0D12" stroke-width="2"/>
+   <path d="M190 40 V20 H210 M190 40 V60 H210" stroke="#0B0D12" stroke-width="2" fill="none"/>
+   <rect x="210" y="4" width="86" height="32" fill="#3D63F0"/><text x="253" y="21" text-anchor="middle" font-family="Onest" font-size="11.5" font-weight="700" fill="#fff">КТК</text>
+   <rect x="210" y="46" width="86" height="32" fill="#3D63F0"/><text x="253" y="63" text-anchor="middle" font-family="Onest" font-size="11.5" font-weight="700" fill="#fff">Атырау–Самара</text>
+   <text x="0" y="120" font-family="Noto Serif Display" font-style="italic" font-size="20" fill="#0B0D12">Паттерн:</text>
+   <text x="0" y="148" font-family="Onest" font-size="14" font-weight="700" fill="#0B0D12">Ложная диверсификация</text>
+   <text x="0" y="172" font-family="Onest" font-size="13" fill="#3A3A3A">Два маршрута — это один, если</text>
+   <text x="0" y="190" font-family="Onest" font-size="13" fill="#3A3A3A">у них общая точка отказа.</text>
+   <rect x="0" y="222" width="296" height="64" fill="#0B0D12"/><text x="16" y="246" font-family="IBM Plex Mono" font-size="10" fill="#B9B4A8">ГДЕ ЕЩЁ ТАК БЫВАЕТ?</text><text x="16" y="268" font-family="Onest" font-size="13" font-weight="700" fill="#F3EFE6">Банки с одним облаком · чипы с одним TSMC</text>
+  </svg>
+ </div></div>
+</div>
+</section>
