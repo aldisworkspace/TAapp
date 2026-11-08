@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build a standalone static copy of Twin Angels for any web host -> dist/twin-angels/ and a zip.
+"""Build a standalone static copy of TA App for any web host -> dist/twin-angels/ and a zip.
 
 Outside claude.ai there is no window.claude: progress lives in the browser (localStorage),
 and Claude-powered features (Ask, explain-check, card generation, prediction verdicts) hide or fall back.
@@ -22,7 +22,7 @@ HEAD = """<!doctype html>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Twin Angels">
+<meta name="apple-mobile-web-app-title" content="TA App">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="icon" type="image/png" href="icon-192.png">
@@ -32,7 +32,7 @@ HEAD = """<!doctype html>
 """
 
 
-README = """# Twin Angels — приложение
+README = """# TA App — приложение
 
 Лента новостей, которая учит понимать, как устроены и связаны политика, международные отношения, экономика, финансы, технологии, энергетика, медиа и искусство. Каждая история: схема, «сначала база», карта участников, механизм «причина → следствие», термины, вопрос и объяснение своими словами. После новостей — библиотека из 120 карточек-основ и повторение терминов.
 
@@ -44,7 +44,7 @@ README = """# Twin Angels — приложение
 ## Как установить на iPhone
 1. Открой адрес сайта в Safari.
 2. «Поделиться» → «На экран «Домой»» → «Добавить».
-3. Иконка Twin Angels откроет приложение на весь экран, без панели браузера.
+3. Иконка TA App откроет приложение на весь экран, без панели браузера.
 
 ## Что работает на обычном хостинге, а что нет
 - Работает: все истории и схемы, словарь по нажатию на слово, вопросы, повторение терминов, серии, XP, карта связей, прогресс.
@@ -94,7 +94,7 @@ def main():
     for s in (180, 192, 512):
         icon(OUT / f"icon-{s}.png", s)
     (OUT / "manifest.webmanifest").write_text(json.dumps({
-        "name": "Twin Angels", "short_name": "Twin Angels", "lang": "ru",
+        "name": "TA App", "short_name": "TA App", "lang": "ru",
         "start_url": "./", "scope": "./", "display": "standalone",
         "background_color": "#07080C", "theme_color": "#07080C",
         "icons": [{"src": "icon-192.png", "sizes": "192x192", "type": "image/png"},
@@ -102,7 +102,7 @@ def main():
     }, ensure_ascii=False, indent=1))
     (OUT / "README.md").write_text(README)
     stamp = datetime.date.today().isoformat()
-    zpath = DIST / f"twin-angels-app-{stamp}.zip"
+    zpath = DIST / f"ta-app-{stamp}.zip"
     with zipfile.ZipFile(zpath, "w", zipfile.ZIP_DEFLATED) as z:
         for f in sorted(OUT.rglob("*")):
             if f.is_file():

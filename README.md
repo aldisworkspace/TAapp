@@ -1,4 +1,6 @@
-# Twin Angels
+# TA App
+
+_Formerly Twin Angels._
 
 A TikTok-style news feed that teaches how the world works: politics, international relations, economy, finance, tech, energy, media and arts, and how each one moves the others.
 

@@ -1,9 +1,9 @@
 ---
 name: brief
-description: Build today's Twin Angels edition — research real news across 8 spheres, decompose each story into facts, mechanism, terms, cross-sphere links, pattern and a quiz, validate, and republish the app. Use when the author says /brief, "новый выпуск", "собери выпуск".
+description: Build today's TA App edition — research real news across 8 spheres, decompose each story into facts, mechanism, terms, cross-sphere links, pattern and a quiz, validate, and republish the app. Use when the author says /brief, "новый выпуск", "собери выпуск".
 ---
 
-# /brief — новый выпуск Twin Angels
+# /brief — новый выпуск TA App
 
 Приложение: https://claude.ai/artifact/35nxFYePHnAAjMSHqHmfQ4 (адрес также в `artifact-url.txt`).
 Исходник страницы: `app/index.html`. Выпуски: `app/editions/<YYYY-MM-DD>.json` + `app/editions/index.json`.
