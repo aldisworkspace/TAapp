@@ -985,7 +985,7 @@ function editionPost(ed, first) {
   const post = h('article', { class: 'post', style: '--c:' + (first ? COL.intl : '#9298A8'), 'data-kind': 'special' });
   return carousel(post, [h('section', { class: 'slide' }, h('div', { class: 'body pad', style: 'justify-content:center;gap:18px' },
     h('div', { class: 'kicker', style: 'color:var(--muted)' }, (first ? 'Выпуск · ' : 'Ранее · ') + fmtDate(ed.date)),
-    h('h2', { class: 'hero' }, first ? 'Как устроен мир на этой неделе' : 'Выпуск ' + fmtDate(ed.date)),
+    h('h2', { class: 'hero' }, ed.title || (first ? 'Как устроен мир на этой неделе' : 'Выпуск ' + fmtDate(ed.date))),
     h('div', { class: 'mosaic' }, KEYS.map(k => h('i', { style: 'background:' + col(k) + ';opacity:' + (spheres.includes(k) ? 1 : .15), title: name(k) }))),
     h('p', { class: 'lede' }, ed.stories.length + ' ' + plural(ed.stories.length, 'история', 'истории', 'историй') + ' в ' + spheres.length + ' сферах.' + (done ? ' Пройдено ' + done + '.' : '')),
     h('p', { class: 'note' }, 'Листай вверх, чтобы перейти к следующей истории, и вбок, чтобы разобрать текущую: механизм, термины, связи, вопрос. После новостей лента продолжится карточками-основами и повторением.')))]);
