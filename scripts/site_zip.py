@@ -3,9 +3,10 @@
 
 Outside claude.ai there is no window.claude: progress lives in the browser (localStorage),
 and Claude-powered features (Ask, explain-check, card generation, prediction verdicts) hide or fall back.
-Usage: python3 scripts/site_zip.py
+Usage: python3 scripts/site_zip.py            # folder + zip
+       python3 scripts/site_zip.py --site-only  # folder only (GitHub Pages)
 """
-import datetime, json, pathlib, shutil, zipfile
+import datetime, json, pathlib, shutil, sys, zipfile
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 APP = ROOT / "app"
@@ -91,8 +92,15 @@ def main():
     for sub in ("editions", "library"):
         shutil.copytree(APP / sub, OUT / sub)
     shutil.copy(APP / "glossary.json", OUT / "glossary.json")
+    assets = ROOT / "assets"
     for s in (180, 192, 512):
-        icon(OUT / f"icon-{s}.png", s)
+        src = assets / f"icon-{s}.png"
+        if src.exists():
+            shutil.copy(src, OUT / src.name)
+        else:  # first run on a machine with matplotlib: create and keep the icons in the repo
+            assets.mkdir(exist_ok=True)
+            icon(src, s)
+            shutil.copy(src, OUT / src.name)
     (OUT / "manifest.webmanifest").write_text(json.dumps({
         "name": "TA App", "short_name": "TA App", "lang": "ru",
         "start_url": "./", "scope": "./", "display": "standalone",
@@ -100,6 +108,9 @@ def main():
         "icons": [{"src": "icon-192.png", "sizes": "192x192", "type": "image/png"},
                   {"src": "icon-512.png", "sizes": "512x512", "type": "image/png"}]
     }, ensure_ascii=False, indent=1))
+    if "--site-only" in sys.argv:  # used by GitHub Actions: just the folder, no README, no zip
+        print(f"{OUT} ready")
+        return
     (OUT / "README.md").write_text(README)
     stamp = datetime.date.today().isoformat()
     zpath = DIST / f"ta-app-{stamp}.zip"
