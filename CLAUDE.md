@@ -8,3 +8,4 @@
 - Прогресс автора хранится в базе артефакта (`state/progress`) и в localStorage как кэш. Claude только читает его.
 - Локальная проверка: `python3 scripts/dev_page.py` → `app/dev.html` (та же обёртка, что добавляет хост артефакта), сервер `python3 -m http.server 8765 --directory app`.
 - Стандарт: каждая история с источниками; шаги механизма помечены fact / inference; ничего не выдумывать.
+- Сайт: GitHub Pages из репозитория aldisworkspace/TAapp, собирается автоматически при каждом пуше в main (`.github/workflows/pages.yml` → `scripts/site_zip.py --site-only`). Иконки лежат в `assets/`.
