@@ -71,6 +71,9 @@ svg text { dominant-baseline: middle; }
 .slides { display: flex; height: 100%; overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; overscroll-behavior-x: contain; scrollbar-width: none; }
 .slide { flex: 0 0 100%; height: 100%; scroll-snap-align: start; overflow-y: auto; position: relative; display: flex; flex-direction: column; }
 .slide > * { min-width: 0; }
+/* While a text field has focus (see focusin in JS): the feed and the slide tracks stop being snapping scrollers, so the keyboard can't re-snap them under the caret. */
+.feed.typing, .feed.typing .slides { overflow: hidden; scroll-snap-type: none; }
+.feed.typing .nextfab { visibility: hidden; pointer-events: none; }
 .pad { padding-left: max(18px, env(safe-area-inset-left, 0px)); padding-right: max(18px, env(safe-area-inset-right, 0px)); }
 .body { display: flex; flex-direction: column; gap: 14px; padding-block: 36px 28px; flex: 1; }
 .segs { position: absolute; top: 10px; left: max(14px, env(safe-area-inset-left, 0px)); right: max(14px, env(safe-area-inset-right, 0px)); display: flex; gap: 4px; z-index: 3; pointer-events: none; }
@@ -78,6 +81,8 @@ svg text { dominant-baseline: middle; }
 .segs i::after { content: ""; display: block; height: 100%; width: 0; background: var(--ink); transition: width .35s var(--ease); }
 .segs i.on::after { width: 100%; }
 .segs.dark i { background: rgba(242, 243, 247, .16); }
+/* Dark slides scroll under the progress bars: a short fade keeps scrolled text from running through them. */
+.segs.dark::before { content: ""; position: absolute; inset: -10px -40px -14px; z-index: -1; background: linear-gradient(var(--bg) 55%, transparent); }
 .segs.dark i::after { background: var(--c); }
 
 /* Cover frame */
@@ -134,6 +139,7 @@ svg text { dominant-baseline: middle; }
 .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 50px; padding: 0 20px; border-radius: 16px; background: var(--c); color: var(--ink); font-weight: 800; transition: transform .15s var(--ease); }
 .btn:active { transform: scale(.97); }
 .btn.ghost { background: var(--panel-2); color: var(--text); }
+.btn svg { width: 20px; height: 20px; flex: none; }
 .btn[disabled] { opacity: .45; pointer-events: none; }
 .row { display: flex; gap: 10px; }
 .row > * { flex: 1 1 0; }
@@ -295,6 +301,7 @@ svg text { dominant-baseline: middle; }
 .optwhy div b { display: block; font-family: var(--mono); font-size: .66rem; letter-spacing: .06em; text-transform: uppercase; color: var(--bad); margin-bottom: 2px; }
 .optwhy div.r { background: color-mix(in srgb, var(--good) 14%, var(--panel)); color: var(--text); }
 .optwhy div.r b { color: var(--good); }
+.optwhy div.k b { color: var(--c); } /* neutral "ключевая мысль N" (self-compare), not an error */
 .chips { display: flex; flex-wrap: wrap; gap: 8px; }
 .chips .chip { font-size: .9rem; }
 textarea { width: 100%; font: inherit; font-size: 1rem; color: var(--text); background: var(--panel-2); border: 1.5px solid var(--line); border-radius: 14px; padding: 12px 14px; resize: vertical; min-height: 54px; }
@@ -486,7 +493,7 @@ function hud(p) {
 
 /* ============ sheet ============ */
 function openSheet(title, body) { const b = $('#sheetBody'); b.textContent = ''; b.append(h('h3', null, title), body); const sc = $('#scrim'), sh = $('#sheet'); sc.hidden = false; sh.hidden = false; requestAnimationFrame(() => { sc.classList.add('on'); sh.classList.add('on'); }); }
-function closeSheet() { const sc = $('#scrim'), sh = $('#sheet'); sc.classList.remove('on'); sh.classList.remove('on'); setTimeout(() => { sc.hidden = true; sh.hidden = true; }, 350); }
+function closeSheet() { const sc = $('#scrim'), sh = $('#sheet'); if (sh.contains(document.activeElement)) document.activeElement.blur(); sc.classList.remove('on'); sh.classList.remove('on'); setTimeout(() => { sc.hidden = true; sh.hidden = true; }, 350); }
 $('#scrim').addEventListener('click', closeSheet);
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSheet(); });
 function sourcesSheet(item, generated) {
@@ -770,7 +777,7 @@ function explainSlide(x, post, rec) {
   const res = h('div', { style: 'display:grid;gap:10px' }), btn = h('button', { class: 'btn' }, HAS_CLAUDE ? 'Проверить с Claude' : 'Сравнить с ключевыми мыслями');
   if (rec.explainScore != null) ta.value = rec.explainText || '';
   function showPoints(got) {
-    return h('div', { class: 'optwhy' }, (ex.points || []).map((p, i) => h('div', { class: got && got[i] ? 'r' : '' }, h('b', null, got ? (got[i] ? 'есть' : 'не хватает') : 'ключевая мысль ' + (i + 1)), p)));
+    return h('div', { class: 'optwhy' }, (ex.points || []).map((p, i) => h('div', { class: !got ? 'k' : got[i] ? 'r' : '' }, h('b', null, got ? (got[i] ? 'есть' : 'не хватает') : 'ключевая мысль ' + (i + 1)), p)));
   }
   btn.onclick = async () => {
     const text = ta.value.trim(); if (text.length < 15) { res.textContent = ''; res.append(h('p', { class: 'note' }, 'Напиши хотя бы одно-два предложения.')); return; }
@@ -1214,8 +1221,30 @@ function nextRank(lv) { for (const [n, nm] of RANKS) if (n > lv) return nm + ' (
 /* ============ tabs + keys ============ */
 function switchView(v) { for (const k of ['feed', 'map', 'me']) { $('#v-' + k).hidden = k !== v; $('#t-' + k).setAttribute('aria-selected', k === v); } if (v === 'map') renderMap(); if (v === 'me') renderMe(); }
 document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => switchView(t.dataset.v)));
+const isField = el => !!el && (el.tagName === 'TEXTAREA' || el.tagName === 'INPUT' || el.tagName === 'SELECT' || el.isContentEditable);
+/* Typing: the explain textarea lives inside two mandatory scroll-snap scrollers (.feed vertical, .slides horizontal).
+   When the iOS keyboard opens and on every keystroke the engine scrolls those ancestors to reveal the caret, and snapping
+   pulls them straight back: the fight makes typing lag and new text doesn't get painted. While a field has focus we pin
+   the current post and slide and turn snapping and native scrolling off; on blur everything goes back exactly. */
+let pin = null;
+function pinFeed() { if (!pin) return; if (pin.post.isConnected) feed.scrollTop = pin.post.offsetTop; if (pin.track) pin.track.scrollLeft = pin.i * pin.track.clientWidth; }
+document.addEventListener('focusin', e => {
+  if (!isField(e.target)) return;
+  if (!pin) { const post = e.target.closest('.post') || feed.querySelectorAll('.post')[Math.round(feed.scrollTop / feed.clientHeight)];
+    if (!post) return; const track = post.querySelector('.slides'); pin = { post, track, i: track ? Math.round(track.scrollLeft / track.clientWidth) : 0 }; }
+  feed.classList.add('typing');
+});
+function unpin() { feed.classList.remove('typing'); pinFeed(); pin = null; }
+document.addEventListener('focusout', e => {
+  if (!pin || isField(e.relatedTarget)) return;
+  unpin();
+  setTimeout(() => { if (!isField(document.activeElement) && document.scrollingElement.scrollTop) document.scrollingElement.scrollTop = 0; }, 350);
+});
+// Safety net: if the focused field vanished without a focusout (hidden sheet, re-rendered feed), the next touch on the feed unfreezes it.
+feed.addEventListener('pointerdown', () => { if (pin && !isField(document.activeElement)) unpin(); }, { passive: true });
+addEventListener('resize', pinFeed); // keyboards that resize the layout (Android, some iOS modes): keep the same post and slide in place
 document.addEventListener('keydown', e => {
-  if ($('#v-feed').hidden || !$('#sheet').hidden) return;
+  if ($('#v-feed').hidden || !$('#sheet').hidden || isField(e.target)) return;
   const i = Math.round(feed.scrollTop / feed.clientHeight), p = feed.querySelectorAll('.post')[i];
   if (e.key === 'ArrowDown') { e.preventDefault(); feed.scrollTo({ top: (i + 1) * feed.clientHeight, behavior: 'smooth' }); }
   if (e.key === 'ArrowUp') { e.preventDefault(); feed.scrollTo({ top: (i - 1) * feed.clientHeight, behavior: 'smooth' }); }
