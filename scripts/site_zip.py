@@ -27,7 +27,7 @@ HEAD = """<!doctype html>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="icon" type="image/png" href="icon-192.png">
-<style>:root{color-scheme:dark;padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}body{margin:0;font:14px system-ui}img{max-width:100%}[hidden]{display:none!important}</style>
+<style>:root{color-scheme:dark}body{margin:0;font:14px system-ui}img{max-width:100%}[hidden]{display:none!important}</style>
 </head>
 <body>
 """
@@ -92,6 +92,7 @@ def main():
     for sub in ("editions", "library"):
         shutil.copytree(APP / sub, OUT / sub)
     shutil.copy(APP / "glossary.json", OUT / "glossary.json")
+    shutil.copy(APP / "sw.js", OUT / "sw.js")
     assets = ROOT / "assets"
     for s in (180, 192, 512):
         src = assets / f"icon-{s}.png"

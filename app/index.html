@@ -44,7 +44,7 @@ button:focus-visible, a:focus-visible { outline: 2px solid var(--text); outline-
 a { color: inherit; }
 svg text { dominant-baseline: middle; }
 
-.stage { position: relative; height: 100%; max-width: 480px; margin: 0 auto; display: grid; grid-template-rows: var(--hud-h) 1fr var(--tab-h); background: var(--bg); overflow: hidden; }
+.stage { position: relative; height: 100%; max-width: 480px; margin: 0 auto; display: grid; grid-template-rows: var(--hud-h) 1fr auto; padding-top: env(safe-area-inset-top, 0px); background: var(--bg); overflow: hidden; }
 @media (min-width: 600px) { body { background: #0C0E14; } .stage { border-inline: 1px solid var(--line); } }
 
 /* HUD */
@@ -57,7 +57,7 @@ svg text { dominant-baseline: middle; }
 .pill.flame { color: var(--gold); }
 .pill.flame.cold { color: var(--muted); }
 .goal { display: flex; gap: 3px; align-items: center; padding: 0 10px; }
-.goal i { width: 6px; height: 14px; border-radius: 3px; background: #2A2E3A; display: block; transition: background .3s; }
+.goal i { width: 6px; height: 14px; border-radius: 3px; background: #4A5063; display: block; transition: background .3s; }
 .goal i.on { background: var(--gold); }
 .pop { animation: pop .45s var(--ease); }
 @keyframes pop { 40% { transform: scale(1.16); } }
@@ -113,7 +113,8 @@ svg text { dominant-baseline: middle; }
 /* Facts */
 .facts { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
 .facts li { background: var(--panel); border-radius: 16px; padding: 13px 15px; font-size: 1rem; line-height: 1.42; }
-.ref { font-family: var(--mono); font-size: .7rem; font-weight: 600; color: var(--c); vertical-align: 3px; margin-left: 3px; padding: 2px 4px; border-radius: 6px; background: rgba(255,255,255,.06); }
+.ref { font-family: var(--mono); font-size: .7rem; font-weight: 600; color: var(--c); vertical-align: 3px; margin-left: 3px; padding: 2px 4px; border-radius: 6px; background: rgba(255,255,255,.06); position: relative; }
+.ref::after { content: ""; position: absolute; inset: -12px -8px; }
 .srcbtn { display: inline-flex; align-items: center; gap: 8px; align-self: flex-start; min-height: 44px; padding: 0 14px; border-radius: 99px; background: var(--panel); font-weight: 600; font-size: .85rem; color: var(--soft); }
 .srcbtn svg { width: 15px; height: 15px; }
 
@@ -132,7 +133,7 @@ svg text { dominant-baseline: middle; }
 .guess { display: grid; gap: 8px; padding: 14px; border-radius: 18px; border: 1.5px dashed var(--c); }
 .guess b { font-weight: 800; }
 .guess small { color: var(--muted); font-size: .82rem; }
-.chip { text-align: left; padding: 11px 13px; border-radius: 13px; background: var(--panel-2); font-weight: 500; line-height: 1.3; transition: background .2s, transform .15s; }
+.chip { text-align: left; min-height: 44px; padding: 11px 13px; border-radius: 13px; background: var(--panel-2); font-weight: 500; line-height: 1.3; transition: background .2s, transform .15s; }
 .chip:active { transform: scale(.985); }
 .chip.right { background: var(--good); color: var(--ink); }
 .chip.wrong { background: color-mix(in srgb, var(--bad) 30%, var(--panel)); }
@@ -210,17 +211,20 @@ svg text { dominant-baseline: middle; }
 /* Sheet */
 .scrim { position: absolute; inset: 0; background: rgba(3, 4, 8, .6); z-index: 50; opacity: 0; transition: opacity .25s; }
 .scrim.on { opacity: 1; }
-.sheet { position: absolute; left: 0; right: 0; bottom: 0; z-index: 51; background: var(--panel); border-radius: 24px 24px 0 0; max-height: 80%; overflow-y: auto; padding-block: 10px calc(24px + env(safe-area-inset-bottom, 0px)); padding-left: max(20px, env(safe-area-inset-left, 0px)); padding-right: max(20px, env(safe-area-inset-right, 0px)); transform: translateY(100%); transition: transform .35s var(--ease); }
+.sheet { position: absolute; left: 0; right: 0; bottom: var(--kb, 0px); transition: transform .35s var(--ease), bottom .2s; z-index: 51; background: var(--panel); border-radius: 24px 24px 0 0; max-height: 80%; overflow-y: auto; padding-block: 10px calc(24px + env(safe-area-inset-bottom, 0px)); padding-left: max(20px, env(safe-area-inset-left, 0px)); padding-right: max(20px, env(safe-area-inset-right, 0px)); transform: translateY(100%); }
 .sheet.on { transform: none; }
 .grab { width: 40px; height: 4px; border-radius: 4px; background: var(--line); margin: 0 auto 14px; }
-.sheet h3 { font-weight: 900; font-size: 1.2rem; margin: 0 0 10px; }
+.sheet h3 { font-weight: 900; font-size: 1.2rem; margin: 0; }
+.sheet-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 10px; }
+.sheet-x { width: 44px; height: 44px; margin-right: -10px; border-radius: 50%; display: grid; place-items: center; color: var(--muted); flex: none; }
+.sheet-x svg { width: 20px; height: 20px; }
 .src { display: grid; gap: 3px; padding: 12px 0; border-top: 1px solid var(--line); }
 .src a { font-weight: 600; text-decoration: none; overflow-wrap: anywhere; }
 .src a:hover { text-decoration: underline; }
 .src span { font-family: var(--mono); font-size: .72rem; color: var(--muted); }
 
 /* Tabs */
-.tabs { display: grid; grid-template-columns: repeat(3, 1fr); background: var(--bg); border-top: 1px solid var(--line); z-index: 6; padding-left: max(8px, env(safe-area-inset-left, 0px)); padding-right: max(8px, env(safe-area-inset-right, 0px)); }
+.tabs { display: grid; grid-template-columns: repeat(3, 1fr); min-height: var(--tab-h); padding-bottom: env(safe-area-inset-bottom, 0px); background: var(--bg); border-top: 1px solid var(--line); z-index: 6; padding-left: max(8px, env(safe-area-inset-left, 0px)); padding-right: max(8px, env(safe-area-inset-right, 0px)); }
 .tab { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; color: var(--muted); font-size: .7rem; font-weight: 600; min-height: 48px; }
 .tab svg { width: 22px; height: 22px; }
 .tab[aria-selected="true"] { color: var(--text); }
@@ -341,7 +345,7 @@ textarea:focus { outline: none; border-color: var(--c, var(--text)); }
 @keyframes slideUp { from { transform: translateY(12px); } }
 
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; }
+  *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; }
   .float, .spark { display: none; }
 }
 </style>
@@ -423,7 +427,7 @@ function rankOf(lv) { let r = RANKS[0][1]; for (const [n, nm] of RANKS) if (lv >
 /* ============ state ============ */
 function blank() { return { v: 2, updatedAt: 0, xp: 0, bestCombo: 0, streak: 0, lastGoalDay: null, days: {}, stories: {}, lib: {}, terms: {}, spheres: {}, techniques: {} }; }
 let P = blank();
-try { const raw = localStorage.getItem(LS) || localStorage.getItem('ta.progress.v1'); if (raw) P = Object.assign(blank(), JSON.parse(raw)); } catch (e) {}
+try { const raw = localStorage.getItem(LS) || localStorage.getItem('ta.progress.v1'); if (raw) { P = Object.assign(blank(), JSON.parse(raw)); P.v = 2; } } catch (e) {}
 let GEN = [];
 try { GEN = JSON.parse(localStorage.getItem(LS_GEN) || '[]'); } catch (e) {}
 let combo = 0, dbApi = null, progRef = null, genRef = null, saveT = null, saving = false, dirty = false, sync = 'local';
@@ -439,7 +443,9 @@ async function flush() {
   try { await progRef.set(JSON.parse(JSON.stringify(P))); sync = 'cloud'; } catch (e) { dirty = true; sync = e && e.code === 'invalid_argument' ? 'readonly' : 'local'; }
   saving = false; if (dirty && sync !== 'readonly') { clearTimeout(saveT); saveT = setTimeout(flush, 3000); }
 }
-document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') flush(); });
+let hudDay = null;
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') flush(); else if (hudDay && hudDay !== today()) { hud(); } });
+setInterval(() => { if (hudDay && hudDay !== today()) hud(); }, 60000);
 async function connect() {
   try {
     if (!window.claude || !window.claude.use) return;
@@ -483,17 +489,31 @@ function answered(ok, sphere, el, base, label) {
 
 /* ============ HUD ============ */
 function hud(p) {
-  $('#xpN').textContent = P.xp;
+  hudDay = today(); $('#xpN').textContent = P.xp;
   if (p) { const c = $('#xpPill'); c.classList.remove('pop'); void c.offsetWidth; c.classList.add('pop'); }
   $('#streakN').textContent = liveStreak(); $('#streak').classList.toggle('cold', P.lastGoalDay !== today());
   const g = $('#goal'); g.textContent = ''; const t = goalTarget(), q = day().q;
   for (let i = 0; i < t; i++) g.append(h('i', { class: i < q ? 'on' : '' }));
-  g.setAttribute('aria-label', 'Цель дня: ' + Math.min(q, t) + ' из ' + t);
+  g.setAttribute('role', 'img'); g.setAttribute('aria-label', 'Цель дня: ' + Math.min(q, t) + ' из ' + t);
 }
 
 /* ============ sheet ============ */
-function openSheet(title, body) { const b = $('#sheetBody'); b.textContent = ''; b.append(h('h3', null, title), body); const sc = $('#scrim'), sh = $('#sheet'); sc.hidden = false; sh.hidden = false; requestAnimationFrame(() => { sc.classList.add('on'); sh.classList.add('on'); }); }
-function closeSheet() { const sc = $('#scrim'), sh = $('#sheet'); if (sh.contains(document.activeElement)) document.activeElement.blur(); sc.classList.remove('on'); sh.classList.remove('on'); setTimeout(() => { sc.hidden = true; sh.hidden = true; }, 350); }
+let sheetT = null, sheetFrom = null;
+function openSheet(title, body) {
+  clearTimeout(sheetT); sheetFrom = document.activeElement;
+  const b = $('#sheetBody'); b.textContent = '';
+  b.append(h('div', { class: 'sheet-head' }, h('h3', { id: 'sheetTitle' }, title), h('button', { class: 'sheet-x', 'aria-label': 'Закрыть', onclick: closeSheet }, icon('<path d="M6 6l12 12M18 6L6 18"/>'))), body);
+  const sc = $('#scrim'), sh = $('#sheet'); sc.hidden = false; sh.hidden = false;
+  requestAnimationFrame(() => { sc.classList.add('on'); sh.classList.add('on'); const f = sh.querySelector('.sheet-x'); if (f) f.focus({ preventScroll: true }); });
+}
+function closeSheet() {
+  const sc = $('#scrim'), sh = $('#sheet'); if (sh.hidden) return;
+  if (sh.contains(document.activeElement)) document.activeElement.blur();
+  sc.classList.remove('on'); sh.classList.remove('on');
+  clearTimeout(sheetT); sheetT = setTimeout(() => { sc.hidden = true; sh.hidden = true; }, 350);
+  if (sheetFrom && sheetFrom.focus && document.contains(sheetFrom)) sheetFrom.focus({ preventScroll: true }); sheetFrom = null;
+}
+if (window.visualViewport) visualViewport.addEventListener('resize', () => { const kb = Math.max(0, innerHeight - visualViewport.height - visualViewport.offsetTop); document.documentElement.style.setProperty('--kb', kb + 'px'); });
 $('#scrim').addEventListener('click', closeSheet);
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSheet(); });
 function sourcesSheet(item, generated) {
@@ -708,7 +728,7 @@ function quizBlock(q, sphere, rec, onDone, extra) {
     if (Array.isArray(q.explain) && q.explain.length === q.options.length) after.append(h('div', { class: 'optwhy' }, q.options.map((o, i) => h('div', { class: i === q.answer ? 'r' : '' }, h('b', null, 'ABCD'[i] + (i === q.answer ? ' · верно' : ' · неверно')), q.explain[i]))));
     if (extra) after.append(extra());
   }
-  function pick(i, el) { if (rec.quiz != null) return; rec.quiz = i === q.answer; rec.pick = i; rec.at = today(); tech('retrieval'); answered(i === q.answer, sphere, el, 20); reveal(i); onDone && onDone(); }
+  function pick(i, el) { if (rec.quiz != null || box.classList.contains('locked')) return; rec.quiz = i === q.answer; rec.pick = i; rec.at = today(); tech('retrieval'); answered(i === q.answer, sphere, el, 20); reveal(i); onDone && onDone(); }
   if (rec.quiz != null) setTimeout(() => reveal(rec.pick), 0);
   return [h('p', { class: 'q' }, q.q), box, after];
 }
@@ -757,7 +777,7 @@ function storyContext(x) {
   return lines.filter(Boolean).join('\n');
 }
 function askSheet(x) {
-  const out = h('div', { class: 'answer' }), input = h('textarea', { id: 'ask-' + (x.id || 'x'), rows: 2, placeholder: 'Свой вопрос: например, «а зачем Ирану вообще танкеры?»' });
+  const out = h('div', { class: 'answer' }), input = h('textarea', { id: 'ask-' + (x.id || 'x'), 'aria-label': 'Свой вопрос', rows: 2, placeholder: 'Свой вопрос: например, «а зачем Ирану вообще танкеры?»' });
   let ctl;
   async function ask(q, el) {
     if (!sampleFn) { out.textContent = 'Спросить Claude можно только в опубликованном приложении на claude.ai.'; return; }
@@ -773,7 +793,7 @@ function askSheet(x) {
 /* ============ explain it yourself (checked by Claude) ============ */
 function explainSlide(x, post, rec) {
   const ex = x.explain; if (!ex || !ex.q) return null;
-  const ta = h('textarea', { id: 'ex-' + x.id, rows: 5, placeholder: 'Напиши 2–4 предложения своими словами. Не подглядывай.' });
+  const ta = h('textarea', { id: 'ex-' + x.id, 'aria-label': 'Твоё объяснение', rows: 5, placeholder: 'Напиши 2–4 предложения своими словами. Не подглядывай.' });
   const res = h('div', { style: 'display:grid;gap:10px' }), btn = h('button', { class: 'btn' }, HAS_CLAUDE ? 'Проверить с Claude' : 'Сравнить с ключевыми мыслями');
   if (rec.explainScore != null) ta.value = rec.explainText || '';
   function showPoints(got) {
@@ -787,8 +807,8 @@ function explainSlide(x, post, rec) {
     try {
       const r = await sampleFn.json(prompt, { modelTier: 'default', cache: false });
       const got = (ex.points || []).map((_, i) => !!(r && Array.isArray(r.got) && r.got[i])), score = got.filter(Boolean).length;
-      rec.explainScore = score; rec.explainText = text; tech('selfexplain');
-      answered(score >= Math.ceil((ex.points || []).length / 2), x.sphere, btn, 8 * score || 1, 'XP');
+      const first = rec.explainScore == null; rec.explainScore = score; rec.explainText = text; tech('selfexplain');
+      if (first) answered(score >= Math.ceil((ex.points || []).length / 2), x.sphere, btn, 8 * score || 1, 'XP');
       res.textContent = '';
       res.append(h('div', { class: 'why ' + (score === got.length ? 'ok' : 'no') }, h('b', null, score + ' из ' + got.length + ' ключевых мыслей'), (r && r.verdict) || ''), showPoints(got));
       if (r && r.fix) res.append(h('div', { class: 'card' }, h('div', { class: 'lab' }, 'Что поправить'), h('p', null, r.fix)));
@@ -838,8 +858,8 @@ function storyPost(sv, ed) {
     sv.analogy ? h('div', { class: 'card' }, h('div', { class: 'lab' }, 'Где ещё так бывает' + (sv.analogy.kind === 'inference' ? ' · вывод' : '')), h('p', null, sv.analogy.text)) : null)));
 
   const ex = explainSlide(sv, post, st(sv.id));
-  if (sv.quiz) { idx.quiz = slides.length; slides.push(h('section', { class: 'slide' }, h('div', { class: 'body pad' },
-    sh('Проверь себя', '20 XP'), ...quizBlock(sv.quiz, sv.sphere, st(sv.id), () => post.querySelector('.kicker')?.append(h('span', { class: 'ok' }, 'пройдено')), sv.predict ? () => predictBox(sv) : null),
+  if (sv.quiz && Array.isArray(sv.quiz.options)) { idx.quiz = slides.length; slides.push(h('section', { class: 'slide' }, h('div', { class: 'body pad' },
+    sh('Проверь себя', '20 XP'), ...quizBlock(sv.quiz, sv.sphere, st(sv.id), () => post.querySelector('.kicker')?.append(h('span', { class: 'ok' }, 'пройдено')), sv.predict && sv.predict.q ? () => predictBox(sv) : null),
     h('div', { style: 'margin-top:auto' }), ex ? h('button', { class: 'btn ghost', onclick: () => post.goto(idx.quiz + 1) }, 'Дальше: объясни своими словами') : nextCta(post), srcBtn(sv)))); }
   if (ex) slides.push(ex);
   if (idx.mech == null) idx.mech = 1; if (idx.quiz == null) idx.quiz = slides.length - 1;
@@ -887,6 +907,7 @@ function mechSlide(sv, post, ctx) {
 function predictBox(sv) {
   const r = st(sv.id), row = h('div', { class: 'row' });
   const draw = () => { row.textContent = ''; if (r.pred) row.append(h('p', { class: 'note' }, 'Твой прогноз: ' + (r.pred === 'yes' ? 'да' : 'нет') + (HAS_CLAUDE ? '. Claude сверит его с реальностью ' + fmtDate(sv.predict.horizon) + ' — итог придёт в ленту и во вкладку «Прогресс».' : '. Срок: ' + fmtDate(sv.predict.horizon) + '.')));
+    else if (sv.predict.horizon && sv.predict.horizon < today()) row.append(h('p', { class: 'note' }, 'Срок прогноза уже прошёл.'));
     else row.append(h('button', { class: 'btn ghost', onclick: ev => pick('yes', ev.currentTarget) }, 'Да'), h('button', { class: 'btn ghost', onclick: ev => pick('no', ev.currentTarget) }, 'Нет')); };
   function pick(v, el) { r.pred = v; r.predAt = today(); tech('prediction'); award(5, el, 'XP'); draw(); }
   draw();
@@ -902,7 +923,7 @@ function verdictPost(id, v, sv) {
   post.addEventListener('slide', () => {});
   setTimeout(() => { const x = (P.verdictsSeen ||= {}); if (!x[id]) { x[id] = today(); if (hit) P.xp += 30; touch(); hud(true); } }, 1500);
   return carousel(post, [h('section', { class: 'slide' }, h('div', { class: 'body pad', style: 'justify-content:center;gap:14px' },
-    h('div', { class: 'kicker' }, 'Прогноз сверен'), h('h2', { class: 'hero', style: 'font-size:clamp(1.6rem,7vw,2.1rem)' }, sv ? sv.predict.q : 'Прогноз'),
+    h('div', { class: 'kicker' }, 'Прогноз сверен'), h('h2', { class: 'hero', style: 'font-size:clamp(1.6rem,7vw,2.1rem)' }, sv && sv.predict ? sv.predict.q : 'Прогноз'),
     h('div', { class: 'verdict ' + (hit ? 'ok' : 'no') }, h('span', null, 'Ты: ' + (mine === 'yes' ? 'да' : 'нет')), h('span', null, 'Итог: ' + (v.outcome === 'yes' ? 'да' : v.outcome === 'no' ? 'нет' : 'неясно')), h('b', null, hit ? '+30 XP' : 'мимо')),
     h('p', { class: 'lede' }, v.note || ''),
     v.source && v.source.url ? h('a', { class: 'srcbtn', href: v.source.url, target: '_blank', rel: 'noopener' }, icon(I_SRC), clip(v.source.title || v.source.url, 40)) : null,
@@ -940,9 +961,9 @@ function recallPost(t, label) {
   const reveal = h('button', { class: 'btn', onclick: () => { def.hidden = false; reveal.remove(); row.hidden = false; } }, 'Показать значение');
   row.append(h('button', { class: 'btn ghost', onclick: ev => grade(false, ev.currentTarget) }, 'Не вспомнил'), h('button', { class: 'btn', onclick: ev => grade(true, ev.currentTarget) }, 'Знал'));
   function grade(ok, el) {
-    const x = P.terms[t.id]; if (!x) return; tech('spaced');
+    const x = P.terms[t.id]; if (!x || row.dataset.done) return; row.dataset.done = 1; tech('spaced');
     x.box = ok ? Math.min(6, (x.box || 1) + 1) : 1; x.due = addDays(today(), BOX_DAYS[x.box]); x.last = today();
-    if (ok) { award(5, el, 'XP'); burst(el, c); } else touch();
+    answered(ok, t.sphere, el, 5);
     row.textContent = ''; row.append(h('p', { class: 'note' }, ok ? 'Следующий повтор через ' + BOX_DAYS[x.box] + ' ' + plural(BOX_DAYS[x.box], 'день', 'дня', 'дней') + '.' : 'Вернётся завтра. Ошибка сейчас — лучшая подготовка к следующему разу.'));
   }
   return carousel(post, [h('section', { class: 'slide' },
@@ -959,9 +980,9 @@ function reversePost(t, pool) {
   const post = h('article', { class: 'post', style: '--c:' + c, 'data-kind': 'practice' });
   const box = h('div', { class: 'opts' }), after = h('div');
   const btns = opts.map((o, i) => h('button', { class: 'opt', onclick: ev => {
-    box.classList.add('locked'); tech('retrieval'); const ok = o.id === t.id;
+    if (box.classList.contains('locked')) return; box.classList.add('locked'); btns.forEach(b => b.setAttribute('aria-disabled', 'true')); tech('retrieval'); const ok = o.id === t.id;
     btns[opts.indexOf(t)].classList.add('right'); if (!ok) ev.currentTarget.classList.add('wrong');
-    const x = P.terms[t.id]; if (x) { x.box = ok ? Math.min(6, (x.box || 1) + 1) : 1; x.due = addDays(today(), BOX_DAYS[x.box]); }
+    const x = P.terms[t.id]; if (x) { if (!ok || !x.due || x.due <= today()) { x.box = ok ? Math.min(6, (x.box || 1) + 1) : 1; x.due = addDays(today(), BOX_DAYS[x.box]); tech('spaced'); } x.last = today(); }
     answered(ok, t.sphere, ev.currentTarget, 15);
     after.append(h('div', { class: 'why ' + (ok ? 'ok' : 'no') }, h('b', null, ok ? 'Верно' : 'Это ' + t.term), t.def));
   } }, h('span', { class: 'k' }, 'ABCD'[i]), h('span', null, o.term)));
@@ -974,7 +995,7 @@ function patternPost(target, others) {
   const post = h('article', { class: 'post', style: '--c:' + c, 'data-kind': 'practice' });
   const box = h('div', { class: 'opts' }), after = h('div');
   const btns = opts.map((o, i) => h('button', { class: 'opt', onclick: ev => {
-    box.classList.add('locked'); tech('interleave'); const ok = o === target.pattern.name;
+    if (box.classList.contains('locked')) return; box.classList.add('locked'); btns.forEach(b => b.setAttribute('aria-disabled', 'true')); tech('interleave'); const ok = o === target.pattern.name;
     btns[opts.indexOf(target.pattern.name)].classList.add('right'); if (!ok) ev.currentTarget.classList.add('wrong');
     answered(ok, target.sphere, ev.currentTarget, 15);
     after.append(h('div', { class: 'why ' + (ok ? 'ok' : 'no') }, h('b', null, target.pattern.name), target.pattern.text));
@@ -988,13 +1009,14 @@ function patternPost(target, others) {
 /* ============ special posts ============ */
 function editionPost(ed, first) {
   const spheres = [...new Set(ed.stories.map(x => x.sphere))];
-  const done = ed.stories.filter(x => (P.stories[x.id] || {}).quiz != null).length;
   const post = h('article', { class: 'post', style: '--c:' + (first ? COL.intl : '#9298A8'), 'data-kind': 'special' });
+  const sum = () => ed.stories.length + ' ' + plural(ed.stories.length, 'история', 'истории', 'историй') + ' в ' + spheres.length + ' ' + plural(spheres.length, 'сфере', 'сферах', 'сферах') + '.' + ((n => n ? ' Пройдено ' + n + '.' : '')(ed.stories.filter(x => (P.stories[x.id] || {}).quiz != null).length));
+  post.refresh = () => { const l = post.querySelector('.ed-sum'); if (l) l.textContent = sum(); };
   return carousel(post, [h('section', { class: 'slide' }, h('div', { class: 'body pad', style: 'justify-content:center;gap:18px' },
     h('div', { class: 'kicker', style: 'color:var(--muted)' }, (first ? 'Выпуск · ' : 'Ранее · ') + fmtDate(ed.date)),
     h('h2', { class: 'hero' }, ed.title || (first ? 'Как устроен мир на этой неделе' : 'Выпуск ' + fmtDate(ed.date))),
     h('div', { class: 'mosaic' }, KEYS.map(k => h('i', { style: 'background:' + col(k) + ';opacity:' + (spheres.includes(k) ? 1 : .15), title: name(k) }))),
-    h('p', { class: 'lede' }, ed.stories.length + ' ' + plural(ed.stories.length, 'история', 'истории', 'историй') + ' в ' + spheres.length + ' сферах.' + (done ? ' Пройдено ' + done + '.' : '')),
+    h('p', { class: 'lede ed-sum' }, sum()),
     h('p', { class: 'note' }, 'Листай вверх, чтобы перейти к следующей истории, и вбок, чтобы разобрать текущую: механизм, термины, связи, вопрос. После новостей лента продолжится карточками-основами и повторением.')))]);
 }
 function warmupPost(n) {
@@ -1004,14 +1026,19 @@ function warmupPost(n) {
     h('p', { class: 'lede' }, 'Сначала вспомни, потом читай новое. Вспоминание укрепляет память сильнее, чем перечитывание.')))]);
 }
 function goalPost() {
+  const post = h('article', { class: 'post', style: '--c:#FFC857', 'data-kind': 'special' });
+  carousel(post, [h('section', { class: 'slide' }, goalBody())]);
+  post.refresh = () => { const b = post.querySelector('.body'); if (b) b.replaceWith(goalBody()); };
+  return post;
+}
+function goalBody() {
   const t = goalTarget(), q = Math.min(day().q, t), d = day(), R = 58, C = 2 * Math.PI * R;
   const ring = s('svg', { class: 'ring', viewBox: '0 0 140 140', role: 'img', 'aria-label': 'Цель дня ' + q + ' из ' + t });
   ring.append(s('circle', { cx: 70, cy: 70, r: R, fill: 'none', stroke: '#1A1D26', 'stroke-width': 14 }), s('circle', { cx: 70, cy: 70, r: R, fill: 'none', stroke: '#FFC857', 'stroke-width': 14, 'stroke-linecap': 'round', 'stroke-dasharray': C, 'stroke-dashoffset': C * (1 - q / t), transform: 'rotate(-90 70 70)' }), s('text', { x: 70, y: 72, 'text-anchor': 'middle', 'font-family': 'Golos Text', 'font-size': 30, 'font-weight': 900, fill: '#F2F3F7' }, q + '/' + t));
-  const post = h('article', { class: 'post', style: '--c:#FFC857', 'data-kind': 'special' });
-  return carousel(post, [h('section', { class: 'slide' }, h('div', { class: 'body pad', style: 'justify-content:center;gap:16px' },
+  return h('div', { class: 'body pad', style: 'justify-content:center;gap:16px' },
     h('div', { class: 'kicker' }, 'Итог новостей'), ring, h('h2', { class: 'hero' }, q >= t ? 'Цель дня закрыта' : 'До цели: ' + (t - q)),
     h('p', { class: 'lede' }, 'Верных сегодня: ' + d.ok + ' из ' + d.q + '. Серия дней: ' + liveStreak() + '. Лучшая серия ответов: ' + P.bestCombo + '.'),
-    h('p', { class: 'note' }, 'Дальше — основы: как устроены ставки, санкции, сети, рынки. Они делают завтрашние новости понятнее.')))]);
+    h('p', { class: 'note' }, 'Дальше — основы: как устроены ставки, санкции, сети, рынки. Они делают завтрашние новости понятнее.'));
 }
 function morePost() {
   const post = h('article', { class: 'post', style: '--c:' + COL.tech, 'data-kind': 'special' });
@@ -1057,12 +1084,20 @@ function genPrompt() {
 {"sphere":"economy","kind":"concept|pattern|player","title":"до 70 знаков","lede":"1-2 предложения","steps":["3-5 звеньев причина→следствие, до 90 знаков"],"example":{"text":"до 180 знаков","year":"2008"},"terms":[{"id":"kebab-id","term":"English term","def":"определение по-русски"}],"links":[{"sphere":"finance","text":"как это влияет на другую сферу"}],"quiz":{"q":"вопрос на понимание механизма","options":["A","B","C","D"],"answer":1,"why":"почему"},"sources":[{"publisher":"Wikipedia","title":"...","url":"https://..."}]}`;
 }
 function endReview() {
-  const seen = allLib().filter(c => (P.lib[c.id] || {}).seen);
-  return seen.length ? shuffle(seen).slice(0, 6).map(cd => ({ t: 'lib', cd, gen: !!cd.gen, review: true })) : [];
+  const seen = allLib().filter(c => (P.lib[c.id] || {}).seen && (P.lib[c.id] || {}).quiz == null);
+  return seen.length ? shuffle(seen).slice(0, 4).map(cd => ({ t: 'lib', cd, gen: !!cd.gen, review: true })) : [];
+}
+function donePost() {
+  const post = h('article', { class: 'post', style: '--c:' + COL.finance, 'data-kind': 'special' });
+  const due = dueTerms().length;
+  return carousel(post, [h('section', { class: 'slide' }, h('div', { class: 'body pad', style: 'justify-content:center;gap:16px' },
+    h('div', { class: 'kicker' }, 'На сегодня всё'), h('h2', { class: 'hero' }, 'Ты дочитал ленту'),
+    h('p', { class: 'lede' }, 'Новый выпуск выйдет завтра утром. ' + (due ? 'К повтору ждут ' + due + ' ' + plural(due, 'термин', 'термина', 'терминов') + ' — они появятся в начале ленты.' : 'Термины для повтора тоже вернутся по расписанию.')),
+    h('button', { class: 'btn ghost', onclick: () => switchView('me') }, 'Посмотреть прогресс')))]);
 }
 
 /* ============ feed engine ============ */
-let EDITIONS = [], LIB = [], feedQ = [], qi = 0, contentCount = 0, moreShown = false, practiceSeen = new Set(), sentinelObs, seenObs;
+let EDITIONS = [], LIB = [], feedQ = [], qi = 0, contentCount = 0, moreShown = false, reviewDone = false, doneShown = false, practiceSeen = new Set(), sentinelObs, seenObs;
 const feed = $('#feed');
 function allLib() { return LIB.concat(GEN); }
 function libOrder() {
@@ -1072,12 +1107,13 @@ function libOrder() {
   return out;
 }
 function planFeed() {
-  feedQ = []; qi = 0; contentCount = 0; moreShown = false; practiceSeen = new Set();
+  feedQ = []; qi = 0; contentCount = 0; moreShown = false; reviewDone = false; doneShown = false; practiceSeen = new Set();
   for (const [id, v] of Object.entries(VERDICTS)) if ((P.stories[id] || {}).pred && !(P.verdictsSeen || {})[id]) feedQ.push({ t: 'verdict', id, v, sv: allStories().find(x => x.id === id) });
   const due = dueTerms();
   if (due.length) { feedQ.push({ t: 'warmup', n: Math.min(3, due.length) }); due.slice(0, 3).forEach(x => { feedQ.push({ t: 'recall', x, label: 'Разминка' }); practiceSeen.add('r:' + x.id); }); }
-  EDITIONS.forEach((ed, i) => {
-    const list = i === 0 ? ed.stories : ed.stories.filter(x => (P.stories[x.id] || {}).quiz == null);
+  EDITIONS.slice(0, 3).forEach((ed, i) => {
+    const stories = Array.isArray(ed.stories) ? ed.stories : [];
+    const list = i === 0 ? stories : stories.filter(x => { const r = P.stories[x.id] || {}; return r.quiz == null && !r.seen; });
     if (!list.length) return;
     feedQ.push({ t: 'edition', ed, first: i === 0 });
     list.forEach(sv => feedQ.push({ t: 'story', sv, ed }));
@@ -1109,15 +1145,20 @@ function render(it) {
     case 'pattern': return patternPost(it.target, it.others);
     case 'more': return morePost();
     case 'verdict': return verdictPost(it.id, it.v, it.sv);
+    case 'done': return donePost();
   }
 }
 function appendBatch(n) {
   for (let k = 0; k < n; k++) {
-    let it = feedQ[qi++];
+    let it = feedQ[qi];
     if (!it) {
-      if (!moreShown) { moreShown = true; if (HAS_CLAUDE) it = { t: 'more' }; }
-      if (!it) { const r = endReview(); if (!r.length) { qi--; return; } feedQ.push(...r); it = feedQ[qi++]; }
+      if (!moreShown) { moreShown = true; if (HAS_CLAUDE) feedQ.push({ t: 'more' }); }
+      if (!feedQ[qi] && !reviewDone) { reviewDone = true; feedQ.push(...endReview()); }
+      if (!feedQ[qi] && !doneShown) { doneShown = true; feedQ.push({ t: 'done' }); }
+      it = feedQ[qi];
+      if (!it) break;
     }
+    qi++;
     const el = render(it); if (!el) continue; feed.append(el);
     if (it.t === 'story' || it.t === 'lib') { contentCount++; if (contentCount % 2 === 0) { const p = practiceItem(); if (p) feed.append(render(p)); } }
   }
@@ -1129,7 +1170,19 @@ function watch() {
   feed.querySelectorAll('.post:not([data-l])').forEach(p => { p.dataset.l = 1; liveObs.observe(p); });
   feed.querySelectorAll('.post[data-kind="story"]:not([data-o]),.post[data-kind="lib"]:not([data-o])').forEach(p => { p.dataset.o = 1; seenObs.observe(p); });
 }
-const liveObs = new IntersectionObserver(es => { for (const e of es) e.target.classList.toggle('live', e.isIntersecting); }, { root: null, threshold: .55 });
+const liveObs = new IntersectionObserver(es => { for (const e of es) {
+  const on = e.isIntersecting; e.target.classList.toggle('live', on);
+  e.target.querySelectorAll('svg.actors').forEach(v => { try { on ? v.unpauseAnimations() : v.pauseAnimations(); } catch (_) {} });
+  if (on && e.target.refresh) e.target.refresh();
+} }, { root: null, threshold: .55 });
+/* Keep the DOM small: once far below, posts above the viewport are removed and the scroll position is shifted by their height. */
+const KEEP_ABOVE = 6;
+function prune() {
+  const posts = [...feed.querySelectorAll(':scope > .post')], hgt = feed.clientHeight; if (!hgt) return;
+  const cur = Math.round(feed.scrollTop / hgt), drop = cur - KEEP_ABOVE; if (drop < 6 || pin) return;
+  for (const p of posts.slice(0, drop)) { liveObs.unobserve(p); seenObs.unobserve(p); tailObs.unobserve(p); p.remove(); }
+  feed.style.scrollSnapType = 'none'; feed.scrollTop -= drop * hgt; requestAnimationFrame(() => { feed.style.scrollSnapType = ''; });
+}
 seenObs = new IntersectionObserver(es => { for (const e of es) if (e.isIntersecting) {
   const id = e.target.dataset.id, k = e.target.dataset.kind;
   if (k === 'story') { const r = st(id); if (!r.seen) { r.seen = today(); day().seen++; touch(); } }
@@ -1137,12 +1190,13 @@ seenObs = new IntersectionObserver(es => { for (const e of es) if (e.isIntersect
 }}, { root: feed, threshold: .6 });
 let lastMore = 0;
 function maybeMore() { const now = Date.now(); if (now - lastMore < 150) return; if (feed.scrollTop + feed.clientHeight * 4 >= feed.scrollHeight) { lastMore = now; appendBatch(6); } }
+feed.addEventListener('scrollend', () => prune(), { passive: true });
 feed.addEventListener('scroll', maybeMore, { passive: true });
 feed.addEventListener('scrollend', maybeMore, { passive: true });
 function rebuild() { feed.textContent = ''; planFeed(); if (!feedQ.length && !LIB.length) { feed.append(emptyPost()); return; } appendBatch(8); }
 function emptyPost() { return carousel(h('article', { class: 'post', style: '--c:' + COL.intl }), [h('section', { class: 'slide' }, h('div', { class: 'body pad', style: 'justify-content:center' }, h('h2', { class: 'hero' }, 'Выпуски не загрузились'), h('p', { class: 'lede' }, 'Проверь соединение и открой страницу ещё раз.')))]); }
 function dueTerms() { const d = today(); return Object.entries(P.terms).filter(([, t]) => t.due && t.due <= d).map(([id, t]) => Object.assign({ id }, t)).sort((a, b) => a.due < b.due ? -1 : 1); }
-function allStories() { return EDITIONS.flatMap(e => e.stories); }
+function allStories() { return EDITIONS.flatMap(e => Array.isArray(e.stories) ? e.stories : []); }
 
 /* ============ map ============ */
 function renderMap() {
@@ -1161,6 +1215,7 @@ function renderMap() {
   const pats = allStories().filter(x => x.pattern && (P.stories[x.id] || {}).seen).map(x => [x.pattern.name, x.pattern.text, x.sphere]).concat(allLib().filter(c => c.kind === 'pattern' && (P.lib[c.id] || {}).seen).map(c => [c.title, c.lede, c.sphere]));
   el.append(h('div', null, h('h5', null, 'Коллекция паттернов · ' + pats.length), pats.length ? h('div', { class: 'list' }, pats.map(([n, t, sp]) => h('div', { class: 'card', style: 'border-left:4px solid ' + col(sp) }, h('h4', null, n), h('p', null, t)))) : h('p', { class: 'empty' }, 'Паттерны собираются, когда ты проходишь истории и карточки.')));
 }
+const mapCache = { key: null, pos: null };
 function drawGraph(cv, nodes) {
   const dpr = Math.min(2, devicePixelRatio || 1), W = cv.clientWidth, H = cv.clientHeight; if (!W) return;
   cv.width = W * dpr; cv.height = H * dpr; const ctx = cv.getContext('2d'); ctx.scale(dpr, dpr);
@@ -1168,10 +1223,20 @@ function drawGraph(cv, nodes) {
   KEYS.forEach((k, i) => { const a = -Math.PI / 2 + i * 2 * Math.PI / KEYS.length; A[k] = { x: cx + R * Math.cos(a), y: cy + R * Math.sin(a) }; });
   let seed = 7; const rnd = () => (seed = (seed * 9301 + 49297) % 233280) / 233280;
   for (const n of nodes) { const a = A[n.primary]; n.x = (a.x * 2 + cx) / 3 + (rnd() - .5) * 30; n.y = (a.y * 2 + cy) / 3 + (rnd() - .5) * 30; }
-  for (let it = 0; it < 220; it++) for (const n of nodes) {
-    let fx = 0, fy = 0; for (const k of n.sp) { const a = A[k], w = k === n.primary ? .035 : .01; fx += (a.x - n.x) * w; fy += (a.y - n.y) * w; }
-    for (const m of nodes) { if (m === n) continue; const dx = n.x - m.x, dy = n.y - m.y, d2 = dx * dx + dy * dy + .01; if (d2 < 2500) { const f = 90 / d2; fx += dx * f; fy += dy * f; } }
-    n.x = Math.max(10, Math.min(W - 10, n.x + Math.max(-5, Math.min(5, fx)))); n.y = Math.max(10, Math.min(H - 10, n.y + Math.max(-5, Math.min(5, fy))));
+  const key = W + 'x' + H + ':' + nodes.length, cached = mapCache.key === key ? mapCache.pos : null;
+  if (cached) for (const n of nodes) { const c = cached[n.id]; if (c) { n.x = c[0]; n.y = c[1]; } }
+  else {
+    for (let it = 0; it < 120; it++) {
+      const grid = new Map(), cell = 50, gk = (x, y) => Math.floor(x / cell) + ',' + Math.floor(y / cell);
+      for (const n of nodes) { const k = gk(n.x, n.y); (grid.get(k) || grid.set(k, []).get(k)).push(n); }
+      for (const n of nodes) {
+        let fx = 0, fy = 0; for (const k of n.sp) { const a = A[k], w = k === n.primary ? .035 : .01; fx += (a.x - n.x) * w; fy += (a.y - n.y) * w; }
+        const gx = Math.floor(n.x / cell), gy = Math.floor(n.y / cell);
+        for (let i = -1; i <= 1; i++) for (let j = -1; j <= 1; j++) for (const m of grid.get((gx + i) + ',' + (gy + j)) || []) { if (m === n) continue; const dx = n.x - m.x, dy = n.y - m.y, d2 = dx * dx + dy * dy + .01; if (d2 < 2500) { const f = 90 / d2; fx += dx * f; fy += dy * f; } }
+        n.x = Math.max(10, Math.min(W - 10, n.x + Math.max(-5, Math.min(5, fx)))); n.y = Math.max(10, Math.min(H - 10, n.y + Math.max(-5, Math.min(5, fy))));
+      }
+    }
+    mapCache.key = key; mapCache.pos = {}; for (const n of nodes) mapCache.pos[n.id] = [n.x, n.y];
   }
   ctx.lineWidth = 1;
   for (const n of nodes) if (P.terms[n.id]) for (const k of n.sp) { ctx.strokeStyle = col(k) + '55'; ctx.beginPath(); ctx.moveTo(n.x, n.y); ctx.lineTo(A[k].x, A[k].y); ctx.stroke(); }
@@ -1207,11 +1272,11 @@ function renderMe() {
     techRow('Чередование', 'Сферы перемешаны, а между историями идут задания «узнай паттерн» и обратное вспоминание.', T.interleave),
     techRow('Двойное кодирование', 'Каждая история — схема плюс текст: цифры, цепочки и связи видны глазами.', null),
     techRow('Уточнение через примеры', '«Где ещё так бывает» и примеры из истории привязывают новое к уже известному.', null),
-    techRow('Объяснение своими словами', 'После вопроса пишешь, как понял, — Claude сверяет с ключевыми мыслями и показывает, чего не хватает.', T.selfexplain),
-    techRow('Вопросы по ходу', 'Кнопка «Спросить» на обложке: Claude объясняет проще, на примере или через Казахстан.', T.ask),
-    techRow('Прогнозы', 'Ставишь да или нет на будущее событие; при /brief прогноз сверяется с реальностью.', T.prediction))));
+    techRow('Объяснение своими словами', HAS_CLAUDE ? 'После вопроса пишешь, как понял, — Claude сверяет с ключевыми мыслями и показывает, чего не хватает.' : 'После вопроса пишешь, как понял, и сравниваешь с ключевыми мыслями.', T.selfexplain),
+    HAS_CLAUDE ? techRow('Вопросы по ходу', 'Кнопка «Спросить» на обложке: Claude объясняет проще, на примере или через Казахстан.', T.ask) : null,
+    techRow('Прогнозы', HAS_CLAUDE ? 'Ставишь да или нет на будущее событие; в срок прогноз сверяется с реальностью.' : 'Ставишь да или нет на будущее событие и проверяешь себя, когда наступит срок.', T.prediction))));
   const preds = allStories().filter(x => x.predict && (P.stories[x.id] || {}).pred);
-  el.append(h('div', null, h('h5', null, 'Твои прогнозы'), preds.length ? h('div', { class: 'list' }, preds.map(x => { const v = VERDICTS[x.id], mine = P.stories[x.id].pred; return h('div', { class: 'card' }, h('h4', { style: 'font-size:1rem' }, x.predict.q), h('p', null, 'Твой ответ: ' + (mine === 'yes' ? 'да' : 'нет') + (v ? ' · итог: ' + (v.outcome === 'yes' ? 'да' : v.outcome === 'no' ? 'нет' : 'неясно') + (v.outcome === mine ? ' · угадал' : ' · мимо') : ' · сверка ' + fmtDate(x.predict.horizon))), v && v.note ? h('p', null, v.note) : null); })) : h('p', { class: 'empty' }, 'Прогнозы появляются после вопроса в истории.')));
+  el.append(h('div', null, h('h5', null, 'Твои прогнозы'), preds.length ? h('div', { class: 'list' }, preds.map(x => { const v = VERDICTS[x.id], mine = P.stories[x.id].pred; return h('div', { class: 'card' }, h('h4', { style: 'font-size:1rem' }, x.predict.q), h('p', null, 'Твой ответ: ' + (mine === 'yes' ? 'да' : 'нет') + (v ? ' · итог: ' + (v.outcome === 'yes' ? 'да' : v.outcome === 'no' ? 'нет' : 'неясно') + (v.outcome === mine ? ' · угадал' : ' · мимо') : (x.predict.horizon < today() ? ' · срок прошёл ' : ' · срок ') + fmtDate(x.predict.horizon))), v && v.note ? h('p', null, v.note) : null); })) : h('p', { class: 'empty' }, 'Прогнозы появляются после вопроса в истории.')));
   el.append(h('p', { class: 'sync' }, (sync === 'cloud' ? 'Прогресс сохраняется в облаке страницы' : sync === 'readonly' ? 'Только чтение: прогресс не сохраняется' : 'Прогресс сохранён на этом устройстве') + ' · к повтору сегодня: ' + dueTerms().length + ' · основ пройдено: ' + Object.values(P.lib).filter(x => x.seen).length + ' из ' + allLib().length));
 }
 function techRow(t, d, n) { return h('div', null, h('b', null, t + (n ? ' · ' + n : '')), h('span', null, d)); }
@@ -1258,6 +1323,7 @@ async function load() {
   try { const g = await getJSON('glossary.json'); buildGloss(g.items); } catch (e) { buildGloss([]); }
   try { const li = await getJSON('library/index.json'); const parts = await Promise.all((li.files || []).map(f => getJSON('library/' + f).catch(() => ({ cards: [] })))); LIB = parts.flatMap(p => p.cards || []).filter(validCard); } catch (e) { LIB = []; }
 }
+if (!HAS_CLAUDE && 'serviceWorker' in navigator && /^https?:$/.test(location.protocol)) addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
 (async function boot() {
   hud();
   feed.append(carousel(h('article', { class: 'post', style: '--c:' + COL.intl }), [h('section', { class: 'slide' }, h('div', { class: 'body pad', style: 'justify-content:center' }, h('h2', { class: 'hero' }, 'Собираю ленту…')))]));
