@@ -389,6 +389,18 @@ textarea:focus { outline: none; border-color: var(--c, var(--text)); }
 .about p { margin: 0; color: var(--soft); font-size: .92rem; line-height: 1.5; }
 .about a.btn { text-decoration: none; }
 
+/* pull to refresh */
+.ptr { position: absolute; left: 50%; top: 0; z-index: 7; width: 40px; height: 40px; margin-left: -20px; border-radius: 50%; background: var(--panel-2); color: var(--text); display: grid; place-items: center; box-shadow: 0 6px 18px rgba(0,0,0,.45); transform: translateY(-48px); opacity: 0; pointer-events: none; }
+.ptr svg { width: 20px; height: 20px; }
+.ptr.ready { color: var(--gold); }
+.ptr.spin { transform: translateY(16px); opacity: 1; transition: transform .3s var(--ease), opacity .2s; }
+.ptr.spin svg { animation: spin .8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.ptr.back { transition: transform .3s var(--ease), opacity .3s; }
+.feed.pulling { transition: none; }
+.feed.settle { transition: transform .3s var(--ease); }
+.brand { cursor: pointer; }
+
 /* entrance animations: run when the post is on screen and the slide is active */
 .post.live .slide.on .grow { transform-box: fill-box; transform-origin: left center; animation: growX .9s var(--ease) both; animation-delay: calc(var(--i, 0) * 110ms + 120ms); }
 @keyframes growX { from { transform: scaleX(0); } }
@@ -422,7 +434,7 @@ textarea:focus { outline: none; border-color: var(--c, var(--text)); }
     </div>
   </header>
 
-  <main class="view" id="v-feed"><div class="feed" id="feed"></div></main>
+  <main class="view" id="v-feed"><div class="ptr" id="ptr" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.3-5.6M20 4v5h-5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="feed" id="feed"></div></main>
   <main class="view" id="v-map" hidden><div class="panel" id="map"></div></main>
   <main class="view" id="v-me" hidden><div class="panel" id="me"></div></main>
 
@@ -1020,7 +1032,7 @@ async function shareItem(x) {
   try { if (navigator.share) { await navigator.share({ title, text: title + ' — разбор в TA App', url }); tech('shared'); touch(); return; } } catch (e) { if (e && e.name === 'AbortError') return; }
   try { await navigator.clipboard.writeText(url); toast('Ссылка скопирована'); } catch (e) { toast(url); }
 }
-function buzz(p) { try { if (navigator.vibrate && (!navigator.userActivation || navigator.userActivation.hasBeenActive)) navigator.vibrate(p); } catch (e) {} }
+function buzz(p) { try { if (navigator.vibrate && (!navigator.userActivation || navigator.userActivation.isActive)) navigator.vibrate(p); } catch (e) {} }
 function cover(c, tagL, tagR, vis, textNodes, railEl) {
   return h('section', { class: 'slide' },
     h('div', { class: 'frame' }, h('div', { class: 'tagrow' }, h('span', { class: 'tag' }, tagL), tagR ? h('span', { class: 'tag' }, tagR) : null), vis),
@@ -1433,21 +1445,25 @@ function genPrompt() {
 Ответь ТОЛЬКО JSON-массивом из 5 объектов такого вида:
 {"sphere":"economy","kind":"concept|pattern|player","title":"до 70 знаков","lede":"1-2 предложения","steps":["3-5 звеньев причина→следствие, до 90 знаков"],"example":{"text":"до 180 знаков","year":"2008"},"terms":[{"id":"kebab-id","term":"English term","def":"определение по-русски"}],"links":[{"sphere":"finance","text":"как это влияет на другую сферу"}],"quiz":{"q":"вопрос на понимание механизма","options":["A","B","C","D"],"answer":1,"why":"почему"},"sources":[{"publisher":"Wikipedia","title":"...","url":"https://..."}]}`;
 }
-function endReview() {
-  const seen = allLib().filter(c => (P.lib[c.id] || {}).seen && (P.lib[c.id] || {}).quiz == null);
-  return seen.length ? shuffle(seen).slice(0, 4).map(cd => ({ t: 'lib', cd, gen: !!cd.gen, review: true })) : [];
+/* Endless tail: after the planned feed, keep mixing every story from all editions and every library card
+   not yet shown in this session — unanswered first, then the rest as review. When all have been shown, start a new round. */
+function endless(n) {
+  const fresh = [], again = [];
+  const add = it => { const id = it.sv ? it.sv.id : it.cd.id; if (shownIds.has(id)) return; const r = it.sv ? P.stories[id] : P.lib[id]; ((r && r.quiz != null) ? again : fresh).push(it); };
+  for (const ed of EDITIONS) for (const sv of ed.stories || []) add({ t: 'story', sv, ed });
+  for (const cd of allLib()) add({ t: 'lib', cd, gen: !!cd.gen });
+  let pool = interleave(shuffle(fresh)).concat(interleave(shuffle(again)));
+  if (!pool.length) { if (!shownIds.size) return []; shownIds.clear(); round++; return endless(n); }
+  return pool.slice(0, n);
 }
-function donePost() {
-  const post = h('article', { class: 'post', style: '--c:' + COL.finance, 'data-kind': 'special' });
-  const due = dueTerms().length;
-  return carousel(post, [h('section', { class: 'slide' }, h('div', { class: 'body pad', style: 'justify-content:center;gap:16px' },
-    h('div', { class: 'kicker' }, 'На сегодня всё'), h('h2', { class: 'hero' }, 'Ты дочитал ленту'),
-    h('p', { class: 'lede' }, 'Новый выпуск выйдет завтра утром. ' + (due ? 'К повтору ждут ' + due + ' ' + plural(due, 'термин', 'термина', 'терминов') + ' — они появятся в начале ленты.' : 'Термины для повтора тоже вернутся по расписанию.')),
-    h('button', { class: 'btn ghost', onclick: () => switchView('me') }, 'Посмотреть прогресс')))]);
+function interleave(items) { // avoid two posts of the same sphere in a row
+  const out = [], rest = items.slice();
+  while (rest.length) { const last = out.length ? (out[out.length - 1].sv || out[out.length - 1].cd).sphere : null; const i = rest.findIndex(x => (x.sv || x.cd).sphere !== last); out.push(rest.splice(i < 0 ? 0 : i, 1)[0]); }
+  return out;
 }
 
 /* ============ feed engine ============ */
-let EDITIONS = [], LIB = [], feedQ = [], qi = 0, contentCount = 0, moreShown = false, reviewDone = false, doneShown = false, practiceSeen = new Set(), sentinelObs, seenObs;
+let EDITIONS = [], LIB = [], feedQ = [], qi = 0, contentCount = 0, moreShown = false, shownIds = new Set(), round = 0, practiceSeen = new Set(), sentinelObs, seenObs;
 const feed = $('#feed');
 function allLib() { return LIB.concat(GEN); }
 function libOrder() {
@@ -1458,13 +1474,13 @@ function libOrder() {
 }
 function deepLinkId() { const m = /[#&]s=([^&]+)/.exec(location.hash); return m ? decodeURIComponent(m[1]) : null; }
 function planFeed() {
-  feedQ = []; qi = 0; contentCount = 0; moreShown = false; reviewDone = false; doneShown = false; practiceSeen = new Set();
+  feedQ = []; qi = 0; contentCount = 0; moreShown = false; shownIds = new Set(); round = 0; practiceSeen = new Set();
   for (const [id, v] of Object.entries(VERDICTS)) if ((P.stories[id] || {}).pred && !(P.verdictsSeen || {})[id]) feedQ.push({ t: 'verdict', id, v, sv: allStories().find(x => x.id === id) });
   const due = dueTerms();
   if (due.length) { feedQ.push({ t: 'warmup', n: Math.min(3, due.length) }); due.slice(0, 3).forEach(x => { feedQ.push({ t: 'recall', x, label: 'Разминка' }); practiceSeen.add('r:' + x.id); }); }
   EDITIONS.slice(0, 3).forEach((ed, i) => {
     const stories = Array.isArray(ed.stories) ? ed.stories : [];
-    const list = i === 0 ? stories : stories.filter(x => { const r = P.stories[x.id] || {}; return r.quiz == null && !r.seen; });
+    const list = stories.filter(x => { const r = P.stories[x.id] || {}; return i === 0 ? !r.seen || r.seen === today() && r.quiz == null && !refreshedOnce : r.quiz == null && !r.seen; });
     if (!list.length) return;
     feedQ.push({ t: 'edition', ed, first: i === 0 });
     list.forEach(sv => feedQ.push({ t: 'story', sv, ed }));
@@ -1489,7 +1505,7 @@ function helloPost() {
   post.addEventListener('slide', e => { if (e.detail === 2) done(); });
   return carousel(post, [
     step(tiles, 'Новости, которые учат', 'Каждое утро — свежие истории из восьми сфер. В каждой видно, как одно событие толкает другое: от ставки ЦБ до цены бензина.', h('div', { class: 'hint' }, 'Листай влево', icon(I_NEXT))),
-    step(h('div', { class: 'gesture' }, h('i', { class: 'g-up' }), h('i', { class: 'g-left' })), 'Вверх — дальше. Влево — глубже', 'Свайп вверх ведёт к следующей истории. Свайп влево разбирает текущую: база, участники, механизм, термины, вопрос. Двойной тап по обложке — сохранить.'),
+    step(h('div', { class: 'gesture' }, h('i', { class: 'g-up' }), h('i', { class: 'g-left' })), 'Вверх — дальше. Влево — глубже', 'Свайп вверх ведёт к следующей истории. Свайп влево разбирает текущую: база, участники, механизм, термины, вопрос. Двойной тап по обложке — сохранить. Потяни ленту вниз в самом верху — она обновится.'),
     step(h('div', { class: 'goal-demo' }, [0, 1, 2, 3, 4].map(i => h('i', { style: '--i:' + i }))), 'Пять ответов в день', 'Цель дня — пять ответов. Термины, которые ты открыл, вернутся на повтор через 1, 3, 7 и 30 дней: так они остаются в памяти.', h('button', { class: 'btn', onclick: () => { done(); goNext(post); } }, 'Начать', icon('<path d="M12 5v14M6 13l6 6 6-6"/>')))
   ]);
 }
@@ -1517,7 +1533,6 @@ function render(it) {
     case 'pattern': return patternPost(it.target, it.others);
     case 'more': return morePost();
     case 'verdict': return verdictPost(it.id, it.v, it.sv);
-    case 'done': return donePost();
     case 'hello': return helloPost();
   }
 }
@@ -1526,12 +1541,12 @@ function appendBatch(n) {
     let it = feedQ[qi];
     if (!it) {
       if (!moreShown) { moreShown = true; if (HAS_CLAUDE) feedQ.push({ t: 'more' }); }
-      if (!feedQ[qi] && !reviewDone) { reviewDone = true; feedQ.push(...endReview()); }
-      if (!feedQ[qi] && !doneShown) { doneShown = true; feedQ.push({ t: 'done' }); }
+      if (!feedQ[qi]) feedQ.push(...endless(8));
       it = feedQ[qi];
       if (!it) break;
     }
     qi++;
+    if (it.t === 'story' || it.t === 'lib') { const id = it.sv ? it.sv.id : it.cd.id; if (shownIds.has(id) && !it.forced) continue; shownIds.add(id); }
     const el = render(it); if (!el) continue; feed.append(el);
     if (it.t === 'story' || it.t === 'lib') { contentCount++; if (contentCount % 2 === 0) { const p = practiceItem(); if (p) feed.append(render(p)); } }
   }
@@ -1683,8 +1698,40 @@ function stat(v, l) { return h('div', { class: 'stat' }, h('b', null, v), h('spa
 function nextRank(lv) { for (const [n, nm] of RANKS) if (n > lv) return nm + ' (уровень ' + n + ')'; return 'максимум'; }
 
 /* ============ tabs + keys ============ */
+/* ============ pull to refresh ============ */
+let refreshing = false, refreshedOnce = false;
+async function refreshFeed(manual) {
+  if (refreshing) return; refreshing = true; refreshedOnce = true;
+  const ptr = $('#ptr'); ptr.classList.remove('back'); ptr.classList.add('spin');
+  const before = new Set(EDITIONS.map(e => e.date)), seenBefore = new Set(allStories().map(s => s.id));
+  try { await load(); } catch (e) {}
+  const added = allStories().filter(s => !seenBefore.has(s.id)).length, newEd = EDITIONS.some(e => !before.has(e.date));
+  feed.style.scrollSnapType = 'none'; rebuild(); feed.scrollTop = 0; requestAnimationFrame(() => { feed.style.scrollSnapType = ''; });
+  setTimeout(() => { ptr.classList.remove('spin'); ptr.classList.add('back'); ptr.style.transform = ''; ptr.style.opacity = ''; refreshing = false; }, 350);
+  buzz(10);
+  toast(newEd || added ? 'Новый выпуск: ' + added + ' ' + plural(added, 'история', 'истории', 'историй') : navigator.onLine === false ? 'Нет сети — показываю сохранённое' : 'Лента обновлена: сначала то, что ты ещё не видел');
+}
+(() => {
+  const ptr = $('#ptr'), MAX = 120, GO = 72; let y0 = null, d = 0, active = false;
+  feed.addEventListener('touchstart', e => { if (refreshing || pin || feed.scrollTop > 0 || e.touches.length > 1) { y0 = null; return; } y0 = e.touches[0].clientY; d = 0; active = false; }, { passive: true });
+  feed.addEventListener('touchmove', e => {
+    if (y0 == null) return; const dy = e.touches[0].clientY - y0;
+    if (dy <= 0 || feed.scrollTop > 0) { if (active) reset(); y0 = dy <= 0 ? null : y0; return; }
+    if (!active && Math.abs(dy) < 8) return;
+    active = true; e.preventDefault(); d = Math.min(MAX, dy * .5);
+    feed.classList.add('pulling'); feed.style.transform = `translateY(${d}px)`;
+    ptr.classList.remove('back'); ptr.style.opacity = Math.min(1, d / GO); ptr.style.transform = `translateY(${d - 44}px) rotate(${d * 3}deg)`; ptr.classList.toggle('ready', d >= GO);
+  }, { passive: false });
+  const reset = () => { active = false; feed.classList.remove('pulling'); feed.classList.add('settle'); feed.style.transform = ''; setTimeout(() => feed.classList.remove('settle'), 320); if (!refreshing) { ptr.classList.add('back'); ptr.style.transform = ''; ptr.style.opacity = ''; } ptr.classList.remove('ready'); };
+  feed.addEventListener('touchend', () => { if (y0 == null || !active) { y0 = null; return; } const go = d >= GO; y0 = null; reset(); if (go) refreshFeed(); }, { passive: true });
+  feed.addEventListener('touchcancel', () => { if (active) reset(); y0 = null; }, { passive: true });
+  // Desktop / anywhere: tap the logo, or tap "Лента" while already on the feed.
+  $('.brand').addEventListener('click', () => { if ($('#v-feed').hidden) switchView('feed'); if (feed.scrollTop > 4) feed.scrollTo({ top: 0, behavior: 'smooth' }); else refreshFeed(); });
+  $('.brand').setAttribute('role', 'button'); $('.brand').setAttribute('tabindex', '0'); $('.brand').setAttribute('aria-label', 'Обновить ленту');
+  $('.brand').addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); refreshFeed(); } });
+})();
 function switchView(v) { for (const k of ['feed', 'map', 'me']) { $('#v-' + k).hidden = k !== v; $('#t-' + k).setAttribute('aria-selected', k === v); } if (v === 'map') renderMap(); if (v === 'me') renderMe(); }
-document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => switchView(t.dataset.v)));
+document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => { if (t.dataset.v === 'feed' && !$('#v-feed').hidden) { if (feed.scrollTop > 4) feed.scrollTo({ top: 0, behavior: 'smooth' }); else refreshFeed(); return; } switchView(t.dataset.v); }));
 const isField = el => !!el && (el.tagName === 'TEXTAREA' || el.tagName === 'INPUT' || el.tagName === 'SELECT' || el.isContentEditable);
 /* Typing: the explain textarea lives inside two mandatory scroll-snap scrollers (.feed vertical, .slides horizontal).
    When the iOS keyboard opens and on every keystroke the engine scrolls those ancestors to reveal the caret, and snapping
