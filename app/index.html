@@ -370,6 +370,23 @@ textarea:focus { outline: none; border-color: var(--c, var(--text)); }
 .nd.open .ndw { animation: riseIn .3s var(--ease) both; }
 .pdot { display: inline-block; width: 8px; height: 8px; border-radius: 2px; transform: rotate(45deg); margin-right: 8px; vertical-align: 2px; }
 
+.hello .mosaic { max-width: 340px; }
+.gesture { position: relative; height: 150px; width: 150px; border-radius: 28px; background: var(--panel); }
+.gesture i { position: absolute; width: 34px; height: 34px; border-radius: 50%; background: var(--c); box-shadow: 0 0 0 8px color-mix(in srgb, var(--c) 25%, transparent); }
+.gesture .g-up { left: 34px; top: 92px; }
+.gesture .g-left { left: 92px; top: 34px; background: var(--gold); box-shadow: 0 0 0 8px color-mix(in srgb, var(--gold) 25%, transparent); }
+.slide.on .gesture .g-up { animation: gUp 1.8s var(--ease) infinite; }
+.slide.on .gesture .g-left { animation: gLeft 1.8s var(--ease) infinite .9s; }
+@keyframes gUp { 0%, 15% { translate: 0 0; opacity: 0; } 25% { opacity: 1; } 70% { translate: 0 -64px; opacity: 1; } 100% { translate: 0 -64px; opacity: 0; } }
+@keyframes gLeft { 0%, 15% { translate: 0 0; opacity: 0; } 25% { opacity: 1; } 70% { translate: -64px 0; opacity: 1; } 100% { translate: -64px 0; opacity: 0; } }
+.goal-demo { display: flex; gap: 8px; }
+.goal-demo i { width: 22px; height: 48px; border-radius: 8px; background: #4A5063; display: block; }
+.slide.on .goal-demo i { animation: fillGoal .4s var(--ease) both; animation-delay: calc(var(--i) * 220ms + 300ms); }
+@keyframes fillGoal { to { background: var(--gold); } }
+.about { display: grid; gap: 10px; }
+.about p { margin: 0; color: var(--soft); font-size: .92rem; line-height: 1.5; }
+.about a.btn { text-decoration: none; }
+
 /* entrance animations: run when the post is on screen and the slide is active */
 .post.live .slide.on .grow { transform-box: fill-box; transform-origin: left center; animation: growX .9s var(--ease) both; animation-delay: calc(var(--i, 0) * 110ms + 120ms); }
 @keyframes growX { from { transform: scaleX(0); } }
@@ -995,6 +1012,12 @@ function armDoubleTap(post, item, kind) {
     last = now; lx = e.clientX; ly = e.clientY;
   });
 }
+const I_SHARE = '<path d="M12 3v12M7 8l5-5 5 5M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/>';
+async function shareItem(x) {
+  const url = location.origin + location.pathname + '#s=' + encodeURIComponent(x.id), title = x.headline || x.title;
+  try { if (navigator.share) { await navigator.share({ title, text: title + ' — разбор в TA App', url }); tech('shared'); touch(); return; } } catch (e) { if (e && e.name === 'AbortError') return; }
+  try { await navigator.clipboard.writeText(url); toast('Ссылка скопирована'); } catch (e) { toast(url); }
+}
 function buzz(p) { try { if (navigator.vibrate && (!navigator.userActivation || navigator.userActivation.hasBeenActive)) navigator.vibrate(p); } catch (e) {} }
 function cover(c, tagL, tagR, vis, textNodes, railEl) {
   return h('section', { class: 'slide' },
@@ -1142,7 +1165,7 @@ function storyPost(sv, ed) {
   const bn = sv.bigNumber && sv.bigNumber.value ? h('div', { class: 'bignum' }, h('b', null, sv.bigNumber.value), sv.bigNumber.label ? h('span', null, sv.bigNumber.label) : null) : null;
   slides.push(cover(c, name(sv.sphere), null, [sceneSvg(sv, { number: !!bn }), bn],
     [kick(), h('h2', { class: 'h1' }, sv.headline), h('p', { class: 'lede' }, ...rich(sv.hook, ctx))],
-    rail(post, [[I_SRC, 'Источники', () => sourcesSheet(sv)], ...(HAS_CLAUDE ? [['<path d="M4 5h16v11H8l-4 4V5Z"/>', 'Спросить', () => askSheet(sv)]] : []), [I_Q, 'Вопрос', () => post.goto(idx.quiz)]], sv, 'story')));
+    rail(post, [[I_SRC, 'Источники', () => sourcesSheet(sv)], ...(HAS_CLAUDE ? [['<path d="M4 5h16v11H8l-4 4V5Z"/>', 'Спросить', () => askSheet(sv)]] : []), ...(HAS_CLAUDE ? [] : [[I_SHARE, 'Поделиться', () => shareItem(sv)]]), [I_Q, 'Вопрос', () => post.goto(idx.quiz)]], sv, 'story')));
 
   if (sv.primer && sv.primer.length) slides.push(h('section', { class: 'slide' }, h('div', { class: 'body pad' },
     sh('Сначала база', 'без этого не понять'),
@@ -1431,6 +1454,7 @@ function libOrder() {
   while (any) { any = false; for (const k of order) if (by[k].length) { out.push(by[k].shift()); any = true; } }
   return out;
 }
+function deepLinkId() { const m = /[#&]s=([^&]+)/.exec(location.hash); return m ? decodeURIComponent(m[1]) : null; }
 function planFeed() {
   feedQ = []; qi = 0; contentCount = 0; moreShown = false; reviewDone = false; doneShown = false; practiceSeen = new Set();
   for (const [id, v] of Object.entries(VERDICTS)) if ((P.stories[id] || {}).pred && !(P.verdictsSeen || {})[id]) feedQ.push({ t: 'verdict', id, v, sv: allStories().find(x => x.id === id) });
@@ -1445,6 +1469,27 @@ function planFeed() {
     if (i === 0) feedQ.push({ t: 'goal' });
   });
   libOrder().forEach(cd => feedQ.push({ t: 'lib', cd, gen: !!cd.gen }));
+  const dl = deepLinkId();
+  if (dl) {
+    const at = feedQ.findIndex(q => (q.sv && q.sv.id === dl) || (q.cd && q.cd.id === dl));
+    let item = at >= 0 ? feedQ.splice(at, 1)[0] : null;
+    if (!item) { for (const ed of EDITIONS) { const sv = (ed.stories || []).find(x => x.id === dl); if (sv) { item = { t: 'story', sv, ed }; break; } } }
+    if (item) feedQ.unshift(item);
+  }
+  if (showOnboarding()) feedQ.unshift({ t: 'hello' });
+}
+function showOnboarding() { let seen = false; try { seen = !!localStorage.getItem('ta.hello'); } catch (e) {} return !seen && !P.xp && !Object.keys(P.stories).length; }
+function helloPost() {
+  const post = h('article', { class: 'post', style: '--c:' + COL.intl, 'data-kind': 'special' });
+  const done = () => { try { localStorage.setItem('ta.hello', today()); } catch (e) {} };
+  const step = (big, title, text, extra) => h('section', { class: 'slide' }, h('div', { class: 'body pad hello', style: 'justify-content:center;gap:16px' }, big, h('h2', { class: 'hero' }, title), h('p', { class: 'lede' }, text), extra || null));
+  const tiles = h('div', { class: 'mosaic' }, KEYS.map((k, i) => h('div', { class: 'tl', style: '--tc:' + col(k) + ';--i:' + i }, (() => { const g = s('svg', { viewBox: '0 0 100 100', 'aria-hidden': 'true' }); const gg = s('g', { transform: 'translate(24 8) scale(.52)' }); OBJ[SPHERE_OBJ[k][0]](gg); g.append(gg); return g; })(), h('span', null, SHORT[k] || name(k)))));
+  post.addEventListener('slide', e => { if (e.detail === 2) done(); });
+  return carousel(post, [
+    step(tiles, 'Новости, которые учат', 'Каждое утро — свежие истории из восьми сфер. В каждой видно, как одно событие толкает другое: от ставки ЦБ до цены бензина.', h('div', { class: 'hint' }, 'Листай влево', icon(I_NEXT))),
+    step(h('div', { class: 'gesture' }, h('i', { class: 'g-up' }), h('i', { class: 'g-left' })), 'Вверх — дальше. Влево — глубже', 'Свайп вверх ведёт к следующей истории. Свайп влево разбирает текущую: база, участники, механизм, термины, вопрос. Двойной тап по обложке — сохранить.'),
+    step(h('div', { class: 'goal-demo' }, [0, 1, 2, 3, 4].map(i => h('i', { style: '--i:' + i }))), 'Пять ответов в день', 'Цель дня — пять ответов. Термины, которые ты открыл, вернутся на повтор через 1, 3, 7 и 30 дней: так они остаются в памяти.', h('button', { class: 'btn', onclick: () => { done(); goNext(post); } }, 'Начать', icon('<path d="M12 5v14M6 13l6 6 6-6"/>')))
+  ]);
 }
 function practiceItem() {
   const due = dueTerms().filter(x => !practiceSeen.has('r:' + x.id));
@@ -1471,6 +1516,7 @@ function render(it) {
     case 'more': return morePost();
     case 'verdict': return verdictPost(it.id, it.v, it.sv);
     case 'done': return donePost();
+    case 'hello': return helloPost();
   }
 }
 function appendBatch(n) {
@@ -1605,6 +1651,7 @@ function renderMe() {
     techRow('Прогнозы', HAS_CLAUDE ? 'Ставишь да или нет на будущее событие; в срок прогноз сверяется с реальностью.' : 'Ставишь да или нет на будущее событие и проверяешь себя, когда наступит срок.', T.prediction))));
   const preds = allStories().filter(x => x.predict && (P.stories[x.id] || {}).pred);
   el.append(h('div', null, h('h5', null, 'Твои прогнозы'), preds.length ? h('div', { class: 'list' }, preds.map(x => { const v = VERDICTS[x.id], mine = P.stories[x.id].pred; return h('div', { class: 'card' }, h('h4', { style: 'font-size:1rem' }, x.predict.q), h('p', null, 'Твой ответ: ' + (mine === 'yes' ? 'да' : 'нет') + (v ? ' · итог: ' + (v.outcome === 'yes' ? 'да' : v.outcome === 'no' ? 'нет' : 'неясно') + (v.outcome === mine ? ' · угадал' : ' · мимо') : (x.predict.horizon < today() ? ' · срок прошёл ' : ' · срок ') + fmtDate(x.predict.horizon))), v && v.note ? h('p', null, v.note) : null); })) : h('p', { class: 'empty' }, 'Прогнозы появляются после вопроса в истории.')));
+  el.append(aboutBlock());
   el.append(h('p', { class: 'sync' }, (sync === 'cloud' ? 'Прогресс сохраняется в облаке страницы' : sync === 'readonly' ? 'Только чтение: прогресс не сохраняется' : 'Прогресс сохранён на этом устройстве') + ' · к повтору сегодня: ' + dueTerms().length + ' · основ пройдено: ' + Object.values(P.lib).filter(x => x.seen).length + ' из ' + allLib().length));
 }
 function savedSheet(id, x) {
@@ -1615,6 +1662,19 @@ function savedSheet(id, x) {
     it && (it.facts || it.steps) ? h('ul', { class: 'facts' }, (it.facts || it.steps).slice(0, 4).map(f => h('li', null, ...rich(f, ctx, { nums: true })))) : null,
     it && it.pattern ? h('div', { class: 'card acc', style: '--c:' + col(x.s) }, h('div', { class: 'lab' }, 'Паттерн'), h('h4', null, it.pattern.name), h('p', null, it.pattern.text)) : null,
     h('div', { class: 'row' }, it ? h('button', { class: 'btn ghost', onclick: () => sourcesSheet(it) }, 'Источники') : null, h('button', { class: 'btn ghost', onclick: () => { if (it) setSaved(it, x.kind, false); else { delete P.saved[id]; touch(); } closeSheet(); renderMe(); } }, 'Убрать'))));
+}
+function aboutBlock() {
+  let armed = false; const reset = h('button', { class: 'btn ghost', style: '--c:var(--bad)' }, 'Сбросить прогресс');
+  reset.onclick = () => {
+    if (!armed) { armed = true; reset.textContent = 'Точно? Нажми ещё раз'; reset.style.background = 'color-mix(in srgb, var(--bad) 28%, var(--panel-2))'; setTimeout(() => { armed = false; reset.textContent = 'Сбросить прогресс'; reset.style.background = ''; }, 4000); return; }
+    const keep = P.saved; P = blank(); P.saved = keep || {}; touch(); try { localStorage.removeItem('ta.hello'); } catch (e) {} hud(); rebuild(); renderMe(); toast('Прогресс сброшен. Сохранённое осталось.');
+  };
+  return h('div', { class: 'about' }, h('h5', null, 'О приложении'),
+    h('p', null, 'TA App — лента новостей, которая учит понимать, как связаны политика, международные отношения, экономика, финансы, технологии, энергетика, медиа и искусство.'),
+    h('p', null, 'Истории собираются из открытых источников, ссылки — в каждой истории. Звенья механизма помечены: факт прямо сказан в источнике, вывод — нет. Это не инвестиционная рекомендация.'),
+    h('p', null, HAS_CLAUDE ? 'Прогресс хранится в базе этой страницы на claude.ai.' : 'Прогресс хранится только на этом устройстве. Регистрации, рекламы и трекинга нет.'),
+    h('div', { class: 'row' }, h('a', { class: 'btn ghost', href: 'https://github.com/aldisworkspace/TAapp', target: '_blank', rel: 'noopener' }, 'Код на GitHub'), reset),
+    h('p', { class: 'note' }, 'Нашёл ошибку в истории? Напиши в Issues на GitHub.'));
 }
 function techRow(t, d, n) { return h('div', null, h('b', null, t + (n ? ' · ' + n : '')), h('span', null, d)); }
 function stat(v, l) { return h('div', { class: 'stat' }, h('b', null, v), h('span', null, l)); }

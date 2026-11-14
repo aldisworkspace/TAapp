@@ -24,6 +24,14 @@ HEAD = """<!doctype html>
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="TA App">
+<meta property="og:type" content="website">
+<meta property="og:title" content="TA App — новости, которые учат">
+<meta property="og:description" content="Каждое утро — истории из восьми сфер с механизмом «причина → следствие», терминами и вопросом. Бесплатно, без регистрации.">
+<meta property="og:url" content="https://taapp.nur.capital/">
+<meta property="og:image" content="https://taapp.nur.capital/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="icon" type="image/png" href="icon-192.png">
@@ -102,8 +110,12 @@ def main():
             assets.mkdir(exist_ok=True)
             icon(src, s)
             shutil.copy(src, OUT / src.name)
+    if (assets / "og.png").exists():
+        shutil.copy(assets / "og.png", OUT / "og.png")
     (OUT / "manifest.webmanifest").write_text(json.dumps({
-        "name": "TA App", "short_name": "TA App", "lang": "ru",
+        "name": "TA App", "short_name": "TA App", "lang": "ru", "id": "./",
+        "description": "Новости, которые учат: как устроены и связаны политика, экономика, финансы, технологии, энергетика, медиа и искусство.",
+        "categories": ["education", "news"],
         "start_url": "./", "scope": "./", "display": "standalone",
         "background_color": "#07080C", "theme_color": "#07080C",
         "icons": [{"src": "icon-192.png", "sizes": "192x192", "type": "image/png"},
