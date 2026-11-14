@@ -38,10 +38,12 @@
 }
 *, *::before, *::after { box-sizing: border-box; }
 html, body { height: 100%; }
-body { background: var(--bg); color: var(--text); font-family: var(--f); font-size: 16px; line-height: 1.42; overflow: hidden; -webkit-font-smoothing: antialiased; -webkit-tap-highlight-color: transparent; }
+body { background: var(--bg); color: var(--text); font-family: var(--f); font-size: 16px; line-height: 1.42; overflow: hidden; touch-action: manipulation; -webkit-font-smoothing: antialiased; -webkit-tap-highlight-color: transparent; }
 button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; padding: 0; text-align: inherit; }
 button:focus-visible, a:focus-visible { outline: 2px solid var(--text); outline-offset: 2px; border-radius: 12px; }
 a { color: inherit; }
+::selection { background: color-mix(in srgb, var(--c, #7B93FF) 45%, transparent); color: var(--text); }
+textarea { caret-color: var(--c, var(--text)); }
 svg text { dominant-baseline: middle; }
 
 .stage { position: relative; height: 100%; max-width: 480px; margin: 0 auto; display: grid; grid-template-rows: var(--hud-h) 1fr auto; padding-top: env(safe-area-inset-top, 0px); background: var(--bg); overflow: hidden; }
