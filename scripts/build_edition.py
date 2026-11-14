@@ -49,11 +49,25 @@ def check(s):
         ids = {n.get("id") for n in a.get("nodes") or []}
         if not 2 <= len(ids) <= 5 or any(e.get("from") not in ids or e.get("to") not in ids for e in a.get("edges") or []):
             errs.append("bad actors")
+    sc = s.get("scene")
+    if sc is not None:
+        if any(k not in SCENE_ITEMS for k in sc.get("items") or []):
+            errs.append(f"bad scene item (allowed: {', '.join(sorted(SCENE_ITEMS))})")
+        if any(c not in SCENE_PLACES for c in sc.get("countries") or []):
+            errs.append("bad scene country (use names from SCENE_PLACES in build_edition.py)")
     for l in s.get("links") or []:
         if l.get("sphere") not in SPHERES:
             errs.append(f"bad link sphere {l.get('sphere')}")
     return errs
 
+
+# Must match OBJ and PLACES in app/index.html (illustrated covers).
+SCENE_ITEMS = {"oil", "ship", "bank", "money", "chip", "factory", "power", "gov", "law", "flag", "people", "chart-up", "chart-down", "globe", "warning", "art", "media", "data", "pipe", "vote"}
+SCENE_PLACES = {"США", "Китай", "Россия", "Украина", "Казахстан", "Узбекистан", "Кыргызстан", "Таджикистан", "Туркменистан", "Иран", "Израиль", "Катар",
+                "Саудовская Аравия", "ОАЭ", "Турция", "Германия", "Франция", "Великобритания", "Италия", "Япония", "Индия", "Венесуэла", "Бразилия", "Канада",
+                "Мексика", "Парагвай", "Аргентина", "Австралия", "Южная Корея", "КНДР", "Тайвань", "Сингапур", "Египет", "Нигерия", "ЮАР", "Польша", "Ливан",
+                "Сирия", "Ирак", "Пакистан", "Афганистан", "Беларусь", "Азербайджан", "Армения", "Грузия", "Монголия", "Вьетнам", "Индонезия", "Нидерланды",
+                "Швейцария", "Норвегия", "Швеция", "Испания", "Венгрия", "Дания", "Бельгия", "Европа"}
 
 def main():
     if len(sys.argv) < 2:

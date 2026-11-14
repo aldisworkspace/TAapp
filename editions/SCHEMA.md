@@ -90,3 +90,9 @@ Write for a sharp 17-year-old who has never studied economics, politics or energ
   {"q": "Своими словами: почему санкции против реестра бьют сильнее, чем против одного танкера?", "points": ["через реестр проходят многие суда", "без флага нет страховки и портов", "одним ударом выключаются все сразу"]}  2-4 key points the answer must contain
 
 # glossary.json (app/glossary.json): {"items": [{"k": "ФРС", "alt": ["Fed", "Федрезерв"], "v": "..."}]} — common abbreviations/organisations/jargon across all spheres; the app highlights them everywhere.
+
+## v4 — illustrated cover (optional; the app derives it when absent)
+"scene": {"items": ["tanker-like keys, 1-3"], "countries": ["up to 5 place names"]}
+  items — from: oil ship bank money chip factory power gov law flag people chart-up chart-down globe warning art media data pipe vote. First = the big object on the cover.
+  countries — names from SCENE_PLACES in scripts/build_edition.py (e.g. "США", "Иран", "Туркменистан", "Европа"). Two or more → the cover becomes a mini map with arcs from the first place.
+  Leave it out unless the automatic choice would be wrong: by default the app uses the mechanism/actor icons and the places named in the headline, hook, actors and first facts.

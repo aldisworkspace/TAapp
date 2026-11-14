@@ -87,6 +87,17 @@ svg text { dominant-baseline: middle; }
 
 /* Cover frame */
 .frame { position: relative; flex: none; height: 46%; min-height: 250px; background: var(--c); color: var(--ink); overflow: hidden; }
+.frame svg.scene { position: absolute; inset: 0; width: 100%; height: 100%; }
+.bignum { position: absolute; left: max(18px, env(safe-area-inset-left, 0px)); bottom: 18px; z-index: 2; color: var(--ink); max-width: 56%; }
+.bignum b { display: block; font-weight: 900; font-size: clamp(2.2rem, 11vw, 3.1rem); line-height: .95; letter-spacing: -.035em; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.bignum span { display: block; margin-top: 6px; font-size: .82rem; font-weight: 600; line-height: 1.25; opacity: .78; }
+.post.live .slide.on .sc-o { animation: scRise .8s var(--ease) both; animation-delay: calc(var(--i) * 130ms + 80ms); }
+@keyframes scRise { from { opacity: 0; translate: 0 26px; } }
+.post.live .slide.on .sc-sun { transform-box: fill-box; transform-origin: center; animation: popIn 1s var(--ease) both; }
+.post.live .slide.on .sc-pin { animation: scRise .6s var(--ease) both; animation-delay: calc(var(--i) * 160ms + 300ms); }
+.post.live .slide.on .bignum b { animation: riseIn .6s var(--ease) both .15s; }
+.chartcard { background: var(--c); border-radius: 20px; overflow: hidden; }
+.chartcard svg.vis { display: block; width: 100%; height: auto; }
 .frame svg.vis { position: absolute; inset: 34px 0 0 0; width: 100%; height: calc(100% - 34px); }
 .frame .tagrow { position: absolute; left: max(18px, env(safe-area-inset-left, 0px)); right: max(18px, env(safe-area-inset-right, 0px)); top: 24px; display: flex; justify-content: space-between; gap: 8px; font-weight: 700; font-size: .78rem; z-index: 2; }
 .frame .tag { background: rgba(7, 8, 12, .14); padding: 4px 10px; border-radius: 99px; white-space: nowrap; }
@@ -195,7 +206,12 @@ svg text { dominant-baseline: middle; }
 /* Special posts */
 .hero { font-weight: 900; font-size: clamp(2rem, 9vw, 2.6rem); line-height: 1.02; letter-spacing: -.025em; margin: 0; text-wrap: balance; }
 .mosaic { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
-.mosaic i { aspect-ratio: 1; border-radius: 12px; display: block; }
+.mosaic .tl { aspect-ratio: 1; border-radius: 14px; background: var(--tc); position: relative; overflow: hidden; display: grid; }
+.mosaic .tl svg { width: 100%; height: 100%; grid-area: 1 / 1; }
+.mosaic .tl span { grid-area: 1 / 1; align-self: end; padding: 0 6px 5px; font-size: .58rem; font-weight: 800; color: var(--ink); letter-spacing: .01em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mosaic .tl.off { background: var(--panel); }
+.mosaic .tl.off span { color: var(--muted); }
+.post.live .mosaic .tl { animation: popIn .5s var(--ease) both; animation-delay: calc(var(--i) * 45ms + 120ms); }
 .big-term { font-weight: 900; font-size: clamp(2rem, 9.5vw, 2.7rem); line-height: 1.02; letter-spacing: -.02em; overflow-wrap: anywhere; margin: 0; }
 .ring { width: 140px; height: 140px; }
 .gen-out { white-space: pre-wrap; color: var(--soft); font-size: .9rem; max-height: 9em; overflow: hidden; }
@@ -280,7 +296,7 @@ svg text { dominant-baseline: middle; }
 @keyframes bob { 50% { transform: translateY(3px); } }
 .next-cta { width: 100%; }
 .primer { display: grid; gap: 12px; }
-.pcard { border-radius: 18px; padding: 16px; background: var(--panel); display: grid; gap: 8px; border-left: 4px solid var(--c); }
+.pcard { border-radius: 18px; padding: 16px; background: color-mix(in srgb, var(--c) 9%, var(--panel)); display: grid; gap: 8px; }
 .pcard b { font-weight: 800; font-size: 1.08rem; line-height: 1.25; }
 .pcard p { margin: 0; color: var(--soft); line-height: 1.5; }
 .actwrap { display: grid; gap: 10px; }
@@ -609,6 +625,228 @@ function rippleSvg(center, links) {
   return svg;
 }
 
+/* ============ illustrated scenes (ink + paper on the sphere colour) ============
+   Each object is drawn in a 100×100 box standing on y=100. A scene picks 1–3 objects from the
+   story's own vocabulary (mechanism + actor icons) or, when the story is about places, a mini map. */
+const PAPER = '#F7F4EC';
+const OBJ = {
+  oil: g => { g.append(
+    s('path', { d: 'M30 100L46 18h8l16 82', fill: 'none', stroke: INK, 'stroke-width': 5, 'stroke-linejoin': 'round' }),
+    s('path', { d: 'M36 74h28M40 52h20M43 34h14M33 88l30-36M67 88L37 52M38 70l22-30M62 70L40 40', stroke: INK, 'stroke-width': 3 }),
+    s('rect', { x: 40, y: 10, width: 20, height: 9, rx: 2, fill: INK }),
+    s('path', { d: 'M82 62c5 7 8 11 8 15a8 8 0 0 1-16 0c0-4 3-8 8-15Z', fill: PAPER }),
+    s('rect', { x: 18, y: 96, width: 64, height: 4, rx: 2, fill: INK })); },
+  ship: g => { g.append(
+    s('path', { d: 'M2 66h96l-11 26H11Z', fill: INK }),
+    s('path', { d: 'M8 78h86', stroke: PAPER, 'stroke-width': 3 }),
+    s('rect', { x: 64, y: 40, width: 22, height: 26, rx: 2, fill: INK }),
+    s('rect', { x: 68, y: 45, width: 5, height: 5, fill: PAPER }), s('rect', { x: 77, y: 45, width: 5, height: 5, fill: PAPER }),
+    s('rect', { x: 72, y: 26, width: 6, height: 14, fill: INK }),
+    s('path', { d: 'M14 66V56h40v10', fill: 'none', stroke: INK, 'stroke-width': 4 }),
+    s('path', { d: 'M0 98c8-4 16 4 24 0s16 4 24 0 16 4 24 0 16 4 24 0', fill: 'none', stroke: PAPER, 'stroke-width': 3, 'stroke-linecap': 'round' })); },
+  bank: g => { g.append(
+    s('path', { d: 'M8 36L50 12l42 24Z', fill: INK }),
+    s('circle', { cx: 50, cy: 28, r: 5, fill: PAPER }),
+    ...[16, 34, 56, 74].map(x => s('rect', { x, y: 42, width: 10, height: 42, rx: 2, fill: INK })),
+    s('rect', { x: 6, y: 86, width: 88, height: 6, rx: 2, fill: INK }), s('rect', { x: 2, y: 94, width: 96, height: 6, rx: 2, fill: INK })); },
+  money: g => { g.append(
+    s('rect', { x: 8, y: 30, width: 62, height: 34, rx: 5, fill: PAPER, transform: 'rotate(-10 39 47)' }),
+    s('circle', { cx: 39, cy: 47, r: 9, fill: 'none', stroke: INK, 'stroke-width': 3, transform: 'rotate(-10 39 47)' }),
+    ...[0, 1, 2, 3, 4].map(i => s('rect', { x: 40, y: 88 - i * 9, width: 34, height: 8, rx: 4, fill: i % 2 ? PAPER : INK, stroke: INK, 'stroke-width': 2 })),
+    ...[0, 1, 2].map(i => s('rect', { x: 70, y: 88 - i * 9, width: 26, height: 8, rx: 4, fill: i % 2 ? INK : PAPER, stroke: INK, 'stroke-width': 2 }))); },
+  chip: g => { g.append(
+    s('path', { d: 'M30 14v10M42 14v10M58 14v10M70 14v10M30 76v10M42 76v10M58 76v10M70 76v10M14 30h10M14 42h10M14 58h10M14 70h10M76 30h10M76 42h10M76 58h10M76 70h10', stroke: INK, 'stroke-width': 4, 'stroke-linecap': 'round' }),
+    s('rect', { x: 22, y: 22, width: 56, height: 56, rx: 7, fill: INK }),
+    s('rect', { x: 34, y: 34, width: 32, height: 32, rx: 3, fill: PAPER }),
+    s('path', { d: 'M42 34v32M50 34v32M58 34v32M34 42h32M34 50h32M34 58h32', stroke: INK, 'stroke-width': 1.5, opacity: .5 }),
+    s('rect', { x: 18, y: 96, width: 64, height: 4, rx: 2, fill: INK, opacity: .3 })); },
+  factory: g => { g.append(
+    s('path', { d: 'M4 100V56l20-14v14l20-14v14l20-14V30h10V8h12v92Z', fill: INK }),
+    ...[12, 30, 48].map(x => s('rect', { x, y: 70, width: 9, height: 12, rx: 1, fill: PAPER })),
+    s('circle', { cx: 82, cy: 0, r: 6, fill: PAPER, opacity: .8 }), s('circle', { cx: 92, cy: -9, r: 4, fill: PAPER, opacity: .55 })); },
+  power: g => { g.append(
+    s('path', { d: 'M34 100L46 8h8l12 92M38 72h24M42 44h16M14 28h72M20 46h60M37 84l23-36M63 84L40 48M43 44l11-28M57 44L46 16', fill: 'none', stroke: INK, 'stroke-width': 3.5, 'stroke-linejoin': 'round' }),
+    s('path', { d: 'M14 28v8M86 28v8M20 46v8M80 46v8', stroke: INK, 'stroke-width': 3 }),
+    s('path', { d: 'M78 60l-9 14h7l-3 12 10-15h-7l3-11Z', fill: PAPER })); },
+  gov: g => { g.append(
+    s('path', { d: 'M26 46a24 22 0 0 1 48 0Z', fill: INK }),
+    s('rect', { x: 47, y: 12, width: 6, height: 14, fill: INK }), s('circle', { cx: 50, cy: 10, r: 4, fill: INK }),
+    s('rect', { x: 20, y: 46, width: 60, height: 6, fill: INK }),
+    ...[24, 36, 48, 60, 72].map(x => s('rect', { x, y: 54, width: 5, height: 32, fill: INK })),
+    s('rect', { x: 10, y: 86, width: 80, height: 6, fill: INK }), s('rect', { x: 4, y: 94, width: 92, height: 6, fill: INK }),
+    s('path', { d: 'M36 36a14 10 0 0 1 28 0', fill: 'none', stroke: PAPER, 'stroke-width': 2.5 })); },
+  law: g => { g.append(
+    s('rect', { x: 18, y: 26, width: 46, height: 22, rx: 4, fill: INK, transform: 'rotate(-30 41 37)' }),
+    s('rect', { x: 46, y: 40, width: 46, height: 8, rx: 4, fill: INK, transform: 'rotate(-30 41 37) translate(-4 0)' }),
+    s('rect', { x: 24, y: 30, width: 6, height: 14, fill: PAPER, transform: 'rotate(-30 41 37)' }),
+    s('rect', { x: 8, y: 84, width: 54, height: 12, rx: 3, fill: INK }), s('rect', { x: 14, y: 78, width: 42, height: 8, rx: 3, fill: PAPER, stroke: INK, 'stroke-width': 3 })); },
+  flag: g => { g.append(
+    s('rect', { x: 18, y: 6, width: 5, height: 94, rx: 2, fill: INK }),
+    s('path', { d: 'M23 12c14-6 26 6 40 0s20-4 26-2v38c-6-2-12-4-26 2s-26-6-40 0Z', fill: PAPER, stroke: INK, 'stroke-width': 3 }),
+    s('path', { d: 'M23 30c14-6 26 6 40 0s20-4 26-2', fill: 'none', stroke: INK, 'stroke-width': 6 }),
+    s('rect', { x: 8, y: 94, width: 26, height: 6, rx: 2, fill: INK })); },
+  people: g => { g.append(
+    s('circle', { cx: 26, cy: 46, r: 11, fill: INK }), s('path', { d: 'M8 100v-22a18 18 0 0 1 36 0v22Z', fill: INK }),
+    s('circle', { cx: 74, cy: 46, r: 11, fill: INK }), s('path', { d: 'M56 100v-22a18 18 0 0 1 36 0v22Z', fill: INK }),
+    s('circle', { cx: 50, cy: 36, r: 13, fill: PAPER, stroke: INK, 'stroke-width': 3 }), s('path', { d: 'M28 100V72a22 22 0 0 1 44 0v28Z', fill: PAPER, stroke: INK, 'stroke-width': 3 })); },
+  'chart-up': g => { g.append(
+    ...[[8, 70], [30, 54], [52, 40], [74, 20]].map(([x, y], i) => s('rect', { x, y, width: 18, height: 100 - y, rx: 3, fill: INK, opacity: i === 3 ? 1 : .55 + i * .12 })),
+    s('path', { d: 'M8 58L34 40l20 8 34-36', fill: 'none', stroke: PAPER, 'stroke-width': 4.5, 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }),
+    s('path', { d: 'M72 10h18v18', fill: 'none', stroke: PAPER, 'stroke-width': 4.5, 'stroke-linecap': 'round', 'stroke-linejoin': 'round' })); },
+  'chart-down': g => { g.append(
+    ...[[8, 18], [30, 36], [52, 52], [74, 72]].map(([x, y], i) => s('rect', { x, y, width: 18, height: 100 - y, rx: 3, fill: INK, opacity: i === 3 ? 1 : .55 + i * .12 })),
+    s('path', { d: 'M8 8l26 22 20-6 34 40', fill: 'none', stroke: PAPER, 'stroke-width': 4.5, 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }),
+    s('path', { d: 'M90 46v18H72', fill: 'none', stroke: PAPER, 'stroke-width': 4.5, 'stroke-linecap': 'round', 'stroke-linejoin': 'round' })); },
+  globe: g => { g.append(
+    s('circle', { cx: 50, cy: 50, r: 40, fill: INK }),
+    s('ellipse', { cx: 50, cy: 50, rx: 17, ry: 40, fill: 'none', stroke: PAPER, 'stroke-width': 2.5 }),
+    s('path', { d: 'M10 50h80M16 30h68M16 70h68M50 10v80', stroke: PAPER, 'stroke-width': 2.5 }),
+    s('rect', { x: 34, y: 94, width: 32, height: 6, rx: 3, fill: INK })); },
+  warning: g => { g.append(
+    s('path', { d: 'M50 8l44 80H6Z', fill: INK, 'stroke-linejoin': 'round', stroke: INK, 'stroke-width': 6 }),
+    s('rect', { x: 46, y: 36, width: 8, height: 28, rx: 4, fill: PAPER }), s('circle', { cx: 50, cy: 74, r: 5, fill: PAPER }),
+    s('rect', { x: 6, y: 96, width: 88, height: 4, rx: 2, fill: INK, opacity: .3 })); },
+  art: g => { g.append(
+    s('rect', { x: 8, y: 14, width: 84, height: 70, rx: 3, fill: INK }),
+    s('rect', { x: 17, y: 23, width: 66, height: 52, fill: PAPER }),
+    s('circle', { cx: 66, cy: 38, r: 7, fill: INK }),
+    s('path', { d: 'M17 75l20-26 14 16 10-10 22 20Z', fill: INK }),
+    s('path', { d: 'M38 84l-8 16M62 84l8 16', stroke: INK, 'stroke-width': 4, 'stroke-linecap': 'round' })); },
+  media: g => { g.append(
+    s('path', { d: 'M34 8l16 16 16-16', fill: 'none', stroke: INK, 'stroke-width': 4, 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }),
+    s('rect', { x: 6, y: 24, width: 88, height: 62, rx: 8, fill: INK }),
+    s('rect', { x: 14, y: 32, width: 72, height: 46, rx: 4, fill: PAPER }),
+    s('path', { d: 'M44 44l18 11-18 11Z', fill: INK }),
+    s('rect', { x: 30, y: 92, width: 40, height: 6, rx: 3, fill: INK })); },
+  data: g => { g.append(
+    ...[0, 1, 2, 3].map(i => s('rect', { x: 14, y: 14 + i * 21, width: 72, height: 18, rx: 4, fill: INK })),
+    ...[0, 1, 2, 3].map(i => s('circle', { cx: 26, cy: 23 + i * 21, r: 3, fill: PAPER })),
+    ...[0, 1, 2, 3].map(i => s('path', { d: `M50 ${23 + i * 21}h26`, stroke: PAPER, 'stroke-width': 2.5, opacity: .5, 'stroke-linecap': 'round' })),
+    s('rect', { x: 20, y: 98, width: 60, height: 2, fill: INK })); },
+  pipe: g => { g.append(
+    s('rect', { x: 0, y: 58, width: 100, height: 18, fill: INK }),
+    ...[14, 50, 86].map(x => s('rect', { x: x - 5, y: 52, width: 10, height: 30, rx: 2, fill: INK })),
+    s('path', { d: 'M4 64h92', stroke: PAPER, 'stroke-width': 2.5, opacity: .6 }),
+    s('rect', { x: 47, y: 30, width: 6, height: 22, fill: INK }),
+    s('circle', { cx: 50, cy: 26, r: 12, fill: 'none', stroke: INK, 'stroke-width': 5 }), s('path', { d: 'M38 26h24M50 14v24', stroke: INK, 'stroke-width': 3 }),
+    ...[14, 86].map(x => s('rect', { x: x - 3, y: 82, width: 6, height: 18, fill: INK }))); },
+  vote: g => { g.append(
+    s('rect', { x: 34, y: 8, width: 32, height: 40, rx: 2, fill: PAPER, stroke: INK, 'stroke-width': 3, transform: 'rotate(8 50 28)' }),
+    s('path', { d: 'M42 26l6 6 10-12', fill: 'none', stroke: INK, 'stroke-width': 4, 'stroke-linecap': 'round', 'stroke-linejoin': 'round', transform: 'rotate(8 50 28)' }),
+    s('rect', { x: 10, y: 44, width: 80, height: 56, rx: 5, fill: INK }),
+    s('rect', { x: 30, y: 44, width: 40, height: 6, fill: PAPER }),
+    s('rect', { x: 26, y: 66, width: 48, height: 18, rx: 3, fill: PAPER, opacity: .9 })); }
+};
+const SHORT = { intl: 'Мир', tech: 'Техно', energy: 'Энергия' };
+const SPHERE_OBJ = { politics: ['gov', 'vote', 'people'], intl: ['globe', 'flag', 'ship'], economy: ['factory', 'money', 'chart-up'], finance: ['bank', 'chart-up', 'money'], tech: ['chip', 'data', 'power'], energy: ['oil', 'pipe', 'power'], arts: ['art', 'money', 'people'], media: ['media', 'data', 'people'] };
+function sceneObjects(x) {
+  const pick = (x.scene && Array.isArray(x.scene.items) ? x.scene.items : []).filter(k => OBJ[k]);
+  if (pick.length) return pick.slice(0, 3);
+  const n = {};
+  const add = (k, w) => { if (OBJ[k]) n[k] = (n[k] || 0) + w; };
+  (x.mechanism || []).forEach((m, i) => add(m.icon, i === 0 ? 3 : 2));
+  ((x.actors && x.actors.nodes) || []).forEach(a => add(a.icon, 1));
+  const base = SPHERE_OBJ[x.sphere] || ['globe'], rot = [...String(x.id || '')].reduce((a, ch) => a + ch.charCodeAt(0), 0) % base.length;
+  base.slice(rot).concat(base.slice(0, rot)).forEach((k, i) => add(k, .5 - i * .1));
+  if (n.warning && Object.keys(n).length > 2) n.warning *= .4; // the alert triangle is common; let concrete objects lead
+  return Object.entries(n).sort((a, b) => b[1] - a[1]).map(([k]) => k).slice(0, 3);
+}
+/* Simplified land masses (lon, lat). Coarse on purpose: a sketch of the world, not a reference map. */
+const LAND = [
+  [-166,68,-156,71,-140,70,-120,74,-95,72,-80,73,-62,66,-56,52,-66,44,-76,35,-81,25,-82,30,-90,29,-97,26,-98,20,-90,16,-84,10,-78,8,-82,9,-88,14,-95,16,-105,20,-110,24,-114,31,-118,34,-124,40,-125,48,-134,56,-150,60,-160,58,-166,62],
+  [-73,78,-58,82,-30,83,-20,76,-22,70,-42,60,-50,64,-56,72],
+  [-78,8,-72,12,-62,11,-52,5,-35,-6,-38,-14,-41,-22,-48,-26,-53,-34,-58,-38,-65,-42,-67,-50,-70,-54,-74,-50,-73,-40,-71,-30,-70,-18,-76,-14,-81,-5,-80,0,-77,4],
+  [-9,43,-2,44,-5,48,2,51,8,54,8,57,5,62,14,68,25,71,40,68,55,69,70,73,80,73,100,78,120,74,140,73,160,70,180,70,180,66,170,64,162,62,155,59,140,59,136,55,142,54,140,48,130,42,129,35,127,35,126,39,122,40,120,37,122,31,120,25,114,22,108,21,109,13,106,10,103,8,104,1,100,4,98,8,94,17,92,22,87,22,80,15,77,8,72,20,67,24,62,25,57,25,56,26,58,22,52,16,43,13,35,32,36,36,28,37,26,41,22,37,20,40,16,38,12,44,8,44,3,42,-1,37,-6,36,-9,38],
+  [-5,50,1,51,2,53,-2,56,-3,58,-6,58,-5,54],
+  [-17,21,-17,14,-12,7,-7,4,2,6,9,4,9,-1,12,-6,13,-12,12,-17,15,-27,18,-34,22,-34,27,-33,32,-28,35,-22,40,-15,40,-10,40,-3,43,2,51,11,43,12,38,18,34,27,32,31,25,32,20,31,11,33,10,37,0,36,-5,36,-10,30,-13,27],
+  [44,-25,47,-25,50,-15,49,-12,44,-17],
+  [130,31,132,34,136,35,140,36,142,40,141,45,144,44,140,42,138,37,135,34],
+  [95,5,98,4,106,-6,102,-4], [109,1,114,4,119,6,118,0,116,-4,110,-3], [131,-1,141,-3,150,-10,141,-9],
+  [114,-22,122,-18,130,-12,137,-12,142,-11,146,-19,153,-26,151,-34,146,-39,138,-35,132,-32,124,-34,115,-34],
+  [172,-35,178,-38,174,-41,167,-46,171,-44]
+];
+/* Country markers: stems match Russian case endings (Казахстан/Казахстана/Казахстану). */
+const PLACES = [
+  ['США', /США|Вашингтон|Белый дом|Пентагон|Конгресс/, -98, 39], ['Китай', /Кита[йяюе]|Пекин/, 104, 34], ['Россия', /Росси|Кремл|Москв/, 45, 56],
+  ['Украина', /Украин|Киев/, 31, 49], ['Казахстан', /Казахстан|Астан|Алмат/, 67, 48], ['Узбекистан', /Узбекистан|Ташкент/, 64, 41],
+  ['Кыргызстан', /Кыргызстан|Киргиз|Бишкек/, 75, 41.5], ['Таджикистан', /Таджикистан|Душанбе/, 71, 38.5], ['Туркменистан', /Туркменистан|Ашхабад/, 59, 39],
+  ['Иран', /Иран|Тегеран|Ормуз/, 53, 32], ['Израиль', /Израил|Нетаньяху/, 35, 31], ['Катар', /Катар/, 51, 25.3], ['Саудовская Аравия', /Саудовск|Эр-Рияд/, 45, 24],
+  ['ОАЭ', /ОАЭ|Эмират|Абу-Даби|Дубай/, 54, 24], ['Турция', /Турци|Анкар/, 35, 39], ['Германия', /Германи|Берлин/, 10, 51], ['Франция', /Франци|Париж/, 2, 46.5],
+  ['Великобритания', /Великобритани|Британи|Лондон|Банк Англии/, -2, 53], ['Италия', /Итали|Рим[ае]?\b/, 12.5, 42.5], ['Япония', /Япони|Токио/, 138, 36],
+  ['Индия', /Инди[яиюей]|Нью-Дели/, 78, 22], ['Венесуэла', /Венесуэл/, -66, 7], ['Бразилия', /Бразили/, -52, -10], ['Канада', /Канад/, -106, 57],
+  ['Мексика', /Мексик/, -102, 23], ['Парагвай', /Парагва/, -58, -23], ['Аргентина', /Аргентин/, -64, -34], ['Австралия', /Австрали|Сидне/, 134, -25],
+  ['Южная Корея', /Южн\S* Коре|Сеул/, 128, 36], ['КНДР', /КНДР|Северн\S* Коре|Пхеньян/, 127, 40], ['Тайвань', /Тайван/, 121, 24], ['Сингапур', /Сингапур/, 104, 1.3],
+  ['Египет', /Египт|Египет|Каир/, 30, 27], ['Нигерия', /Нигери/, 8, 9], ['ЮАР', /ЮАР/, 25, -29], ['Польша', /Польш|Варшав/, 19, 52], ['Ливан', /Ливан/, 36, 34],
+  ['Сирия', /Сири[яиюей]\b/, 38, 35], ['Ирак', /Ирак/, 44, 33], ['Пакистан', /Пакистан/, 70, 30], ['Афганистан', /Афганистан/, 66, 34],
+  ['Беларусь', /Беларус|Белорус|Минск/, 28, 53.5], ['Азербайджан', /Азербайджан|Баку/, 48, 40.3], ['Армения', /Армени|Ереван/, 45, 40], ['Грузия', /Грузи[яиюей]\b|Тбилиси/, 44, 42],
+  ['Монголия', /Монголи/, 104, 47], ['Вьетнам', /Вьетнам/, 106, 16], ['Индонезия', /Индонези/, 115, -2], ['Нидерланды', /Нидерланд|Амстердам/, 5, 52],
+  ['Швейцария', /Швейцари/, 8, 47], ['Норвегия', /Норвеги/, 9, 61], ['Швеция', /Швеци/, 16, 62], ['Испания', /Испани|Мадрид/, -4, 40],
+  ['Венгрия', /Венгри/, 19, 47], ['Дания', /Дани[яиюей]\b|Гренланди/, 10, 56], ['Бельгия', /Бельги/, 4, 50.5], ['Европа', /(^|[^\p{L}])ЕС([^\p{L}]|$)|Евросоюз|Еврокомисси|Брюссел|Европ[аыуейо]/u, 10, 49.5]
+];
+function scenePlaces(x) {
+  const ids = (x.scene && Array.isArray(x.scene.countries)) ? x.scene.countries : null;
+  if (ids && ids.length) return ids.map(n => PLACES.find(p => p[0] === n)).filter(Boolean).slice(0, 5);
+  const text = [x.headline || x.title, x.hook || x.lede, ...((x.actors && x.actors.nodes) || []).map(a => a.label), ...(x.facts || []).slice(0, 3)].filter(Boolean).join(' • ');
+  const hits = [];
+  for (const p of PLACES) { const m = p[1].exec(text); if (m) hits.push([m.index, p]); }
+  return hits.sort((a, b) => a[0] - b[0]).map(h => h[1]).slice(0, 5);
+}
+function sceneSvg(x, opt = {}) {
+  const W = 360, H = 300, svg = s('svg', { class: 'scene', viewBox: `0 0 ${W} ${H}`, preserveAspectRatio: 'xMidYMax slice', 'aria-hidden': 'true' });
+  const places = scenePlaces(x), useMap = !opt.objectsOnly && (places.length >= 2 || (places.length === 1 && (x.sphere === 'intl' || x.sphere === 'politics')));
+  return useMap ? mapScene(svg, places, W, H, opt) : objectScene(svg, sceneObjects(x), W, H, opt);
+}
+function objectScene(svg, keys, W, H, opt) {
+  if (!keys.length) keys = ['globe'];
+  const ground = H - 14;
+  svg.append(s('circle', { cx: opt.number ? 262 : 96, cy: opt.number ? 112 : 92, r: 62, fill: PAPER, opacity: .2, class: 'sc-sun' }));
+  for (let i = 0; i < 7; i++) svg.append(s('path', { d: `M0 ${ground - 4 - i * 26}H${W}`, stroke: INK, 'stroke-width': 1, opacity: .05 }));
+  svg.append(s('rect', { x: 0, y: ground, width: W, height: 14, fill: INK, opacity: .12 }));
+  const slots = opt.number ? [[196, 150], [124, 0], [0, 0]] : [[188, 158], [92, 104], [24, 70]];
+  const place = (k, i) => {
+    const [xx, size] = slots[i]; if (!size) return;
+    const g = s('g', { class: 'sc-o', style: '--i:' + i, transform: `translate(${xx} ${ground - size}) scale(${size / 100})` });
+    OBJ[k](g); svg.append(g);
+  };
+  keys.slice(0, opt.number ? 1 : 3).forEach(place);
+  return svg;
+}
+function mapScene(svg, places, W, H, opt) {
+  const lons = places.map(p => p[2]), lats = places.map(p => p[3]);
+  const pad = 26, minLon = Math.min(...lons) - pad, maxLon = Math.max(...lons) + pad, minLat = Math.min(...lats) - pad * .7, maxLat = Math.max(...lats) + pad * .7;
+  const box = { x: 14, y: 46, w: W - 28, h: H - (opt.number ? 120 : 70) };
+  const k = Math.max(1.2, Math.min(5.5, Math.min(box.w / (maxLon - minLon), box.h / (maxLat - minLat))));
+  const cLon = (minLon + maxLon) / 2, cLat = (minLat + maxLat) / 2;
+  const px = lon => box.x + box.w / 2 + (lon - cLon) * k, py = lat => box.y + box.h / 2 - (lat - cLat) * k;
+  const land = s('g', { class: 'sc-land' });
+  for (const poly of LAND) { let d = ''; for (let i = 0; i < poly.length; i += 2) d += (i ? 'L' : 'M') + px(poly[i]).toFixed(1) + ' ' + py(poly[i + 1]).toFixed(1); land.append(s('path', { d: d + 'Z', fill: INK, opacity: .16, 'stroke-linejoin': 'round' })); }
+  svg.append(land);
+  for (let i = 0; i < 9; i++) svg.append(s('path', { d: `M0 ${40 + i * 30}H${W}`, stroke: INK, 'stroke-width': 1, opacity: .04 }));
+  const P0 = places[0];
+  places.slice(1).forEach((p, i) => {
+    const x1 = px(P0[2]), y1 = py(P0[3]), x2 = px(p[2]), y2 = py(p[3]), mx = (x1 + x2) / 2, my = Math.min(y1, y2) - 22 - Math.hypot(x2 - x1, y2 - y1) * .15;
+    svg.append(s('path', { d: `M${x1} ${y1}Q${mx} ${my} ${x2} ${y2}`, fill: 'none', stroke: INK, 'stroke-width': 2.2, 'stroke-dasharray': '1 0', pathLength: 1, class: 'draw', style: '--i:' + i }));
+  });
+  const labels = places.map(p => [px(p[2]) - 7, py(p[3]), 14]);
+  places.forEach((p, i) => {
+    const x = px(p[2]), y = py(p[3]), main = i === 0;
+    const g = s('g', { class: 'sc-pin', style: '--i:' + i });
+    g.append(s('circle', { cx: x, cy: y, r: main ? 13 : 9, fill: PAPER, opacity: .5 }), s('circle', { cx: x, cy: y, r: main ? 6.5 : 5, fill: INK }));
+    const right = x < W - 110, lx = right ? x + (main ? 16 : 12) : x - (main ? 16 : 12);
+    let ly = y + 1; const wdt = p[0].length * (main ? 8.4 : 7.2), x0 = right ? lx : lx - wdt;
+    for (let tries = 0; tries < 4 && labels.some(b => !(x0 + wdt < b[0] || x0 > b[0] + b[2]) && Math.abs(ly - b[1]) < 15); tries++) ly += (tries % 2 ? -1 : 1) * 16 * (tries + 1);
+    labels.push([x0, ly, wdt]);
+    g.append(s('text', { x: lx, y: ly, 'text-anchor': right ? 'start' : 'end', 'font-family': 'Golos Text', 'font-size': main ? 14 : 12, 'font-weight': main ? 900 : 700, fill: INK }, p[0]));
+    svg.append(g);
+  });
+  return svg;
+}
+function sceneTile(x) { // small square used in the edition mosaic
+  const svg = s('svg', { viewBox: '0 0 100 100', 'aria-hidden': 'true' });
+  const k = sceneObjects(x)[0] || (SPHERE_OBJ[x.sphere] || ['globe'])[0];
+  const g = s('g', { transform: 'translate(24 8) scale(.52)' }); OBJ[k](g); svg.append(g); return svg;
+}
+
 /* ============ glossary + rich text ============ */
 let GLOSS = new Map(), GLOSS_RE = null;
 const escRe = x => x.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -829,7 +1067,8 @@ function storyPost(sv, ed) {
   const kick = () => h('div', { class: 'kicker' }, h('span', null, name(sv.sphere)), h('span', { style: 'color:var(--muted)' }, fmtDate(sv.date || ed.date)), rec.quiz != null ? h('span', { class: 'ok' }, 'пройдено') : null);
   const idx = {};
 
-  slides.push(cover(c, name(sv.sphere), sv.bigNumber && !sv.visual ? sv.bigNumber.value : fmtDate(sv.date || ed.date), visSvg(sv.visual, sv),
+  const bn = sv.bigNumber && sv.bigNumber.value ? h('div', { class: 'bignum' }, h('b', null, sv.bigNumber.value), sv.bigNumber.label ? h('span', null, sv.bigNumber.label) : null) : null;
+  slides.push(cover(c, name(sv.sphere), null, [sceneSvg(sv, { number: !!bn }), bn],
     [kick(), h('h2', { class: 'h1' }, sv.headline), h('p', { class: 'lede' }, ...rich(sv.hook, ctx))],
     rail(post, [[I_SRC, 'Источники', () => sourcesSheet(sv)], ...(HAS_CLAUDE ? [['<path d="M4 5h16v11H8l-4 4V5Z"/>', 'Спросить', () => askSheet(sv)]] : []), [I_Q, 'Вопрос', () => post.goto(idx.quiz)]])));
 
@@ -837,6 +1076,10 @@ function storyPost(sv, ed) {
     sh('Сначала база', 'без этого не понять'),
     h('div', { class: 'primer' }, sv.primer.map((p, i) => h('div', { class: 'pcard', style: '--i:' + i }, h('b', null, p.q), h('p', null, ...rich(p.a, ctx))))),
     h('p', { class: 'note' }, 'Подчёркнутые слова можно нажать — там объяснение.'))));
+
+  if (sv.visual) slides.push(h('section', { class: 'slide' }, h('div', { class: 'body pad' },
+    sh('В цифрах', 'из источников'), h('div', { class: 'chartcard' }, visSvg(sv.visual, sv)),
+    sv.bigNumber && sv.bigNumber.label ? h('p', { class: 'note' }, sv.bigNumber.value + ' — ' + sv.bigNumber.label) : null, srcBtn(sv))));
 
   if ((sv.facts && sv.facts.length) || sv.actors) slides.push(h('section', { class: 'slide' }, h('div', { class: 'body pad' },
     sh(sv.actors ? 'Кто участвует' : 'Что случилось', 'факты'),
@@ -935,7 +1178,7 @@ function libPost(cd, gen) {
   const c = col(cd.sphere), rec = P.lib[cd.id] || {}, ctx = ctxFor(cd);
   const post = h('article', { class: 'post', style: '--c:' + c, 'data-kind': 'lib', 'data-id': cd.id, 'aria-label': cd.title });
   const slides = [];
-  slides.push(cover(c, (gen ? 'Claude · ' : 'Основы · ') + name(cd.sphere), KIND[cd.kind] || 'Как это устроено', visSvg(null, cd),
+  slides.push(cover(c, (gen ? 'Claude · ' : 'Основы · ') + name(cd.sphere), KIND[cd.kind] || 'Как это устроено', sceneSvg(cd, { objectsOnly: true }),
     [h('div', { class: 'kicker' }, h('span', null, gen ? 'Сгенерировано по запросу' : 'Библиотека'), rec.quiz != null ? h('span', { class: 'ok' }, 'пройдено') : null), h('h2', { class: 'h1' }, cd.title), h('p', { class: 'lede' }, ...rich(cd.lede, ctx))],
     rail(post, [[I_SRC, 'Источники', () => sourcesSheet(cd, gen)], ...(HAS_CLAUDE ? [['<path d="M4 5h16v11H8l-4 4V5Z"/>', 'Спросить', () => askSheet(cd)]] : []), [I_Q, 'Вопрос', () => post.goto(3)]])));
   const chain = h('div', { class: 'chain' });
@@ -1015,7 +1258,7 @@ function editionPost(ed, first) {
   return carousel(post, [h('section', { class: 'slide' }, h('div', { class: 'body pad', style: 'justify-content:center;gap:18px' },
     h('div', { class: 'kicker', style: 'color:var(--muted)' }, (first ? 'Выпуск · ' : 'Ранее · ') + fmtDate(ed.date)),
     h('h2', { class: 'hero' }, ed.title || (first ? 'Как устроен мир на этой неделе' : 'Выпуск ' + fmtDate(ed.date))),
-    h('div', { class: 'mosaic' }, KEYS.map(k => h('i', { style: 'background:' + col(k) + ';opacity:' + (spheres.includes(k) ? 1 : .15), title: name(k) }))),
+    h('div', { class: 'mosaic' }, KEYS.map(k => { const sv = ed.stories.find(x => x.sphere === k); return h('div', { class: 'tl' + (sv ? '' : ' off'), style: '--tc:' + col(k) + ';--i:' + KEYS.indexOf(k) }, sv ? sceneTile(sv) : null, h('span', null, SHORT[k] || name(k))); })),
     h('p', { class: 'lede ed-sum' }, sum()),
     h('p', { class: 'note' }, 'Листай вверх, чтобы перейти к следующей истории, и вбок, чтобы разобрать текущую: механизм, термины, связи, вопрос. После новостей лента продолжится карточками-основами и повторением.')))]);
 }
@@ -1213,7 +1456,7 @@ function renderMap() {
   const top = Object.entries(pairs).sort((a, b) => b[1] - a[1]).slice(0, 8);
   el.append(h('div', null, h('h5', null, 'Сферы, которые чаще всего влияют друг на друга'), h('div', { class: 'list' }, top.map(([k, n]) => { const [a, b] = k.split('|'); return h('div', { class: 'li' }, h('div', { class: 'nm' }, h('i', { style: 'background:' + col(a) }), name(a), h('span', { style: 'color:var(--muted)' }, '↔'), h('i', { style: 'background:' + col(b) }), name(b)), h('b', null, '×' + n)); }))));
   const pats = allStories().filter(x => x.pattern && (P.stories[x.id] || {}).seen).map(x => [x.pattern.name, x.pattern.text, x.sphere]).concat(allLib().filter(c => c.kind === 'pattern' && (P.lib[c.id] || {}).seen).map(c => [c.title, c.lede, c.sphere]));
-  el.append(h('div', null, h('h5', null, 'Коллекция паттернов · ' + pats.length), pats.length ? h('div', { class: 'list' }, pats.map(([n, t, sp]) => h('div', { class: 'card', style: 'border-left:4px solid ' + col(sp) }, h('h4', null, n), h('p', null, t)))) : h('p', { class: 'empty' }, 'Паттерны собираются, когда ты проходишь истории и карточки.')));
+  el.append(h('div', null, h('h5', null, 'Коллекция паттернов · ' + pats.length), pats.length ? h('div', { class: 'list' }, pats.map(([n, t, sp]) => h('div', { class: 'card', style: 'background:color-mix(in srgb,' + col(sp) + ' 10%, var(--panel))' }, h('h4', null, h('i', { class: 'pdot', style: 'background:' + col(sp) }), n), h('p', null, t)))) : h('p', { class: 'empty' }, 'Паттерны собираются, когда ты проходишь истории и карточки.')));
 }
 const mapCache = { key: null, pos: null };
 function drawGraph(cv, nodes) {
